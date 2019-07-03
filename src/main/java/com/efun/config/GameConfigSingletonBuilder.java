@@ -2,12 +2,10 @@ package com.efun.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.util.ResourceUtils;
-
 import java.io.File;
 
+//Singleton class returns instance of GameConfig class
 public class GameConfigSingletonBuilder {
 
     private static GameConfig single_instance = null;

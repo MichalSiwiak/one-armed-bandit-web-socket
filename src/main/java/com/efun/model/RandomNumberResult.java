@@ -1,10 +1,12 @@
 package com.efun.model;
 
+import com.mongodb.BasicDBObject;
+
 import java.util.List;
 import java.util.Objects;
 
 // class represents one result and positions of reels in Random Numbers (rno)
-public class RandomNumberResult {
+public class RandomNumberResult extends BasicDBObject {
 
     int randomNumber;
     private List<List<Byte>> reelsInRandomNumber;

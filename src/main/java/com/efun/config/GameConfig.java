@@ -2,6 +2,7 @@ package com.efun.config;
 
 import java.util.List;
 
+//class represents configuration file
 public class GameConfig {
 
     private List<List<Byte>> reels;
