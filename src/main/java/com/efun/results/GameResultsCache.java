@@ -1,6 +1,7 @@
 package com.efun.results;
 
 import com.efun.config.GameConfig;
+import com.efun.config.GameConfigSingletonBuilder;
 import com.efun.model.RandomNumberResult;
 import com.google.gson.Gson;
 import org.springframework.util.ResourceUtils;
@@ -12,12 +13,9 @@ import java.util.stream.Collectors;
 //class represents calculation of game results holding in java memory in HashMap
 public class GameResultsCache {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
 
-        Gson gson = new Gson();
-        File gameConfigFile = ResourceUtils.getFile("classpath:config.json");
-        Reader reader = new FileReader(gameConfigFile);
-        GameConfig gameConfig = gson.fromJson(reader, GameConfig.class);
+        GameConfig gameConfig = GameConfigSingletonBuilder.getInstance();
         List<List<Byte>> reels = gameConfig.getReels();
 
         /*
