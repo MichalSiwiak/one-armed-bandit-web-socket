@@ -1,16 +1,25 @@
 package com.efun.model;
 
-import com.mongodb.BasicDBObject;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Objects;
 
 // class represents one result and positions of reels in Random Numbers (rno)
-public class RandomNumberResult extends BasicDBObject {
+public class RandomNumberResult {
 
-    int randomNumber;
+    private ObjectId id;
+    private int randomNumber;
     private List<List<Byte>> reelsInRandomNumber;
-    boolean win;
+    private boolean win;
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
 
     public int getRandomNumber() {
         return randomNumber;
@@ -39,7 +48,8 @@ public class RandomNumberResult extends BasicDBObject {
     @Override
     public String toString() {
         return "RandomNumberResult{" +
-                "randomNumber=" + randomNumber +
+                "id=" + id +
+                ", randomNumber=" + randomNumber +
                 ", reelsInRandomNumber=" + reelsInRandomNumber +
                 ", win=" + win +
                 '}';
@@ -49,14 +59,16 @@ public class RandomNumberResult extends BasicDBObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         RandomNumberResult that = (RandomNumberResult) o;
         return randomNumber == that.randomNumber &&
                 win == that.win &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(reelsInRandomNumber, that.reelsInRandomNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(randomNumber, reelsInRandomNumber, win);
+        return Objects.hash(super.hashCode(), id, randomNumber, reelsInRandomNumber, win);
     }
 }

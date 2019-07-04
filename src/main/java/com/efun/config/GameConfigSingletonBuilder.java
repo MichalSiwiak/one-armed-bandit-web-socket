@@ -16,7 +16,7 @@ public class GameConfigSingletonBuilder {
     public static GameConfig getInstance() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try {
-            File file = ResourceUtils.getFile("classpath:config.yaml");
+            File file = ResourceUtils.getFile("classpath:configFirst.yaml");
             single_instance = mapper.readValue(file, GameConfig.class);
         } catch (Exception e) {
             e.printStackTrace();

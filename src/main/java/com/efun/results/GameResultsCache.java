@@ -2,7 +2,12 @@ package com.efun.results;
 
 import com.efun.config.GameConfig;
 import com.efun.config.GameConfigSingletonBuilder;
+import com.efun.database.DBConfig;
 import com.efun.model.RandomNumberResult;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,6 +17,9 @@ public class GameResultsCache {
 
     public static void main(String[] args) {
 
+        MongoDatabase datasource = DBConfig.getDatasource();
+        MongoCollection<RandomNumberResult> collection = datasource.getCollection("results", RandomNumberResult.class);
+
         GameConfig gameConfig = GameConfigSingletonBuilder.getInstance();
         List<List<Byte>> reels = gameConfig.getReels();
 
@@ -19,17 +27,17 @@ public class GameResultsCache {
         parameters:
         winlines: number <3,12>,
         activeReels: number <3,5>
-         */
+
         //we have 5 reels from: 0,1,2,3,4
-
         List<Integer> winlines = Arrays.asList(3, 4, 5, 6, 7);
-
-        int activeReelsArray[] = {2, 3, 4};
+ */
+        //int activeReelsArray[] = {2, 3, 4};
+        int activeReelsArray[] = {0, 1, 2};
         List<Integer> activeReels = Arrays.stream(activeReelsArray).boxed().collect(Collectors.toList());
-        Map<Integer, RandomNumberResult> gameResultsCache = new HashMap<>();
 
         //what is the maximum of rno number ??
-        for (int i = 1; i <= 10000; i++) {
+        //saving object to database
+        for (int i = 1; i <= 500; i++) {
 
             RandomNumberResult randomNumberResult = new RandomNumberResult();
             randomNumberResult.setRandomNumber(i);
@@ -37,16 +45,38 @@ public class GameResultsCache {
 
             for (Integer activeReel : activeReels) {
                 Collections.rotate(reels.get(activeReel), gameConfig.getSpin().get(activeReel));
-                List<Byte> reel = new ArrayList<>(reels.get(activeReel).subList(0,3));
+                List<Byte> reel = new ArrayList<>(reels.get(activeReel).subList(0, 3));
                 reelsInRandomNumber.add(reel);
             }
 
+            //checking if is win
+            if ((reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(1).get(1)))
+                    && (reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(2).get(1)))) {
+                randomNumberResult.setWin(true);
+            }
+
             randomNumberResult.setReelsInRandomNumber(reelsInRandomNumber);
-            gameResultsCache.put(i, randomNumberResult);
+            collection.insertOne(randomNumberResult);
         }
 
-        for (Integer rno : gameResultsCache.keySet()) {
-            System.out.println(gameResultsCache.get(rno));
+        //get one example element
+        RandomNumberResult randomNumber = collection
+                .withDocumentClass(RandomNumberResult.class)
+                .find(Filters.eq("randomNumber", 233))
+                .first();
+
+        System.out.println(randomNumber.toString());
+        System.out.println("=====================");
+
+        //get only wins elements
+        FindIterable<RandomNumberResult> wins = collection
+                .withDocumentClass(RandomNumberResult.class)
+                .find(Filters.eq("win", true));
+
+        for (RandomNumberResult win : wins) {
+            System.out.println(win.toString());
         }
+
+        //collection.drop();
     }
 }
