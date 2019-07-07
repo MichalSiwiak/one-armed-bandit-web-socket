@@ -1,26 +1,43 @@
-package com.efun.results;
+package com.efun;
 
 import com.efun.config.GameConfig;
-import com.efun.config.GameConfigSingletonBuilder;
-import com.efun.database.DBConfig;
 import com.efun.model.RandomNumberResult;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
-//class represents calculation of game results holding in java memory in HashMap
-public class GameResultsCache {
 
-    public static void main(String[] args) {
+@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
+@SpringBootApplication
+public class OneArmedBanditSpringBootApplication implements CommandLineRunner {
 
-        MongoDatabase datasource = DBConfig.getDatasource();
-        MongoCollection<RandomNumberResult> collection = datasource.getCollection("results", RandomNumberResult.class);
+    @Autowired
+    private GameConfig gameConfig;
 
-        GameConfig gameConfig = GameConfigSingletonBuilder.getInstance();
+    @Autowired
+    private MongoDatabase mongoDatabase;
+
+    @Value("${connection_string_aws}")
+    private String connectionString;
+
+    @Override
+    public void run(String... args) {
+
+        MongoCollection<RandomNumberResult> collection = mongoDatabase.getCollection("results", RandomNumberResult.class);
         List<List<Byte>> reels = gameConfig.getReels();
 
         /*
@@ -31,8 +48,8 @@ public class GameResultsCache {
         //we have 5 reels from: 0,1,2,3,4
         List<Integer> winlines = Arrays.asList(3, 4, 5, 6, 7);
  */
-        //int activeReelsArray[] = {2, 3, 4};
-        int activeReelsArray[] = {0, 1, 2};
+        int activeReelsArray[] = {2, 3, 4};
+        //int activeReelsArray[] = {0, 1, 2};
         List<Integer> activeReels = Arrays.stream(activeReelsArray).boxed().collect(Collectors.toList());
 
         //what is the maximum of rno number ??
@@ -57,6 +74,7 @@ public class GameResultsCache {
 
             randomNumberResult.setReelsInRandomNumber(reelsInRandomNumber);
             collection.insertOne(randomNumberResult);
+            System.out.println(randomNumberResult.toString());
         }
 
         //get one example element
@@ -79,4 +97,9 @@ public class GameResultsCache {
 
         collection.drop();
     }
+
+    public static void main(String[] args) {
+        SpringApplication.run(OneArmedBanditSpringBootApplication.class, args);
+    }
+
 }
