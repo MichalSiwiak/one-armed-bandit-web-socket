@@ -62,7 +62,16 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>LATEST</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
     </dependencies>
+
 
     <properties>
         <javax.websocket-api.version>1.1</javax.websocket-api.version>
