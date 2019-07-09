@@ -1,12 +1,15 @@
-
-# db connection data sources
+#db connection data sources
 #connection_string_aws: mongodb+srv://msiwiak:test@cluster0-xk3sv.mongodb.net/test?retryWrites=true&w=majority
 connection_string_localhost: mongodb://localhost:27017/games
+
+#the upper range of RNO
+max_random_number: 500
+#the maximum number of games supported by server
+max_game_number: 20
 
 ---
 
 # game config
-
 game-config:
   reels:
     - [0, 0, 0, 3, 4, 4, 4, 5, 6, 7, 7, 0, 0, 2, 2, 3, 1, 1, 1, 2, 2]

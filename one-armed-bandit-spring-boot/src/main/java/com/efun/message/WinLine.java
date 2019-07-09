@@ -1,4 +1,4 @@
-package com.efun.model;
+package com.efun.message;
 
 import java.util.List;
 
@@ -29,5 +29,14 @@ public class WinLine {
 
     public void setMultiply(double multiply) {
         this.multiply = multiply;
+    }
+
+    @Override
+    public String toString() {
+        return "WinLine{" +
+                "index=" + index +
+                ", positions=" + positions +
+                ", multiply=" + multiply +
+                '}';
     }
 }

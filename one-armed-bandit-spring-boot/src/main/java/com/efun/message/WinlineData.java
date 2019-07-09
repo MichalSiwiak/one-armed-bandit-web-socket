@@ -1,8 +1,8 @@
-package com.efun.model;
+package com.efun.message;
 
 import java.util.List;
 
-public class WinlinesData {
+public class WinlineData {
 
     private double quantity;
     private List<WinLine> winLines;
@@ -21,5 +21,13 @@ public class WinlinesData {
 
     public void setWinLines(List<WinLine> winLines) {
         this.winLines = winLines;
+    }
+
+    @Override
+    public String toString() {
+        return "WinlineData{" +
+                "quantity=" + quantity +
+                ", winLines=" + winLines +
+                '}';
     }
 }

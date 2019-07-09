@@ -1,4 +1,4 @@
-package com.efun.model;
+package com.efun.entity;
 
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;

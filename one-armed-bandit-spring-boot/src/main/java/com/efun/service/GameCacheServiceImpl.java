@@ -1,6 +1,6 @@
 package com.efun.service;
 
-import com.efun.model.RandomNumberResult;
+import com.efun.entity.RandomNumberResult;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -41,7 +41,6 @@ public class GameCacheServiceImpl implements GameCacheService {
         }
         return results;
     }
-
 
     @Override
     public void save(RandomNumberResult randomNumberResult, String sessionId) {

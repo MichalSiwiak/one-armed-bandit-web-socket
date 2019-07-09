@@ -1,6 +1,6 @@
 package com.efun.service;
 
-import com.efun.model.RandomNumberResult;
+import com.efun.entity.RandomNumberResult;
 
 import java.util.List;
 
