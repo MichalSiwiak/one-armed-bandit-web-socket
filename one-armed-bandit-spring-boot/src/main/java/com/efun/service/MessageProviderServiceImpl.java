@@ -94,7 +94,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 logger.warning("ERROR - No wins calculated for this configuration");
             } else {
                 double quantity = roundDouble2precision((double) wins.size() / (double) maxRno, 4);
-                WinlineData winlineData = new WinlineData();
+                WinLineData winlineData = new WinLineData();
                 winlineData.setQuantity(quantity);
                 List<WinLine> winLinesInResponse = new ArrayList<>();
                 Map<Byte, List<Integer>> positionsMap = new HashMap<>();

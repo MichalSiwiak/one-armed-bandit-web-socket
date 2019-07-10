@@ -8,7 +8,7 @@ public class MessageGameSpin {
     private int gameId;
     private int rno;
     private String message;
-    private WinlineData winlineData;
+    private WinLineData winlineData;
     private List<List<Byte>> symbols;
     private double win;
 
@@ -44,11 +44,11 @@ public class MessageGameSpin {
         this.message = message;
     }
 
-    public WinlineData getWinlineData() {
+    public WinLineData getWinlineData() {
         return winlineData;
     }
 
-    public void setWinlineData(WinlineData winlineData) {
+    public void setWinlineData(WinLineData winlineData) {
         this.winlineData = winlineData;
     }
 

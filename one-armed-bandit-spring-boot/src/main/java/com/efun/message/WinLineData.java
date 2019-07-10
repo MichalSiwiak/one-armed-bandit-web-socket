@@ -2,7 +2,7 @@ package com.efun.message;
 
 import java.util.List;
 
-public class WinlineData {
+public class WinLineData {
 
     private double quantity;
     private List<WinLine> winLines;
@@ -25,7 +25,7 @@ public class WinlineData {
 
     @Override
     public String toString() {
-        return "WinlineData{" +
+        return "WinLineData{" +
                 "quantity=" + quantity +
                 ", winLines=" + winLines +
                 '}';
