@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface MessageProviderService {
 
-    public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels);
+    public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels, String gameId);
 
-    public MessageGameSpin executeSpin(int bet, String token);
+    public MessageGameSpin executeSpin(int rno, int bet, String token);
 
     public MessageGameEnd endGame(String token);
 

@@ -4,7 +4,9 @@ import com.efun.config.GameConfig;
 import com.efun.entity.RandomNumberResult;
 import com.efun.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,7 +16,6 @@ import java.util.logging.Logger;
 public class MessageProviderServiceImpl implements MessageProviderService {
 
     private Logger logger = Logger.getLogger(getClass().getName());
-    private static int spin = 0;
 
     @Value("${max_random_number}")
     private int maxRno;
@@ -36,7 +37,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     //checking List<Integer> winLines to implement !!!
     //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
     @Override
-    public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels) {
+    public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
 
 
         if (sessions.size() > maxGameNumber) {
@@ -54,7 +55,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
             messageGameStart.setAuthorizationToken(token);
             //add method to fill gameId
-            messageGameStart.setGameId(666);
+            messageGameStart.setGameId(gameId);
             logger.info("Generated authorization=" + token);
 
             for (int i = 1; i <= maxRno; i++) {
@@ -136,7 +137,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     @Override
     //maintain situation when rno > maxRno !!!
     //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
-    public MessageGameSpin executeSpin(int bet, String token) {
+    public MessageGameSpin executeSpin(int rno, int bet, String token) {
 
         if (tokenServiceHandler.authorizeRequest(token)) {
             MessageGameStart messageGameStart = sessions.get(token);
@@ -145,10 +146,6 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             messageGameSpin.setGameId(messageGameStart.getGameId());
             messageGameSpin.setWinlineData(messageGameStart.getWinlineData());
 
-            //check this static value after disconnect client!!!
-            spin++;
-
-            int rno = messageGameStart.getRno() + spin;
             messageGameSpin.setRno(rno);
             logger.info("Spin was started ... ");
             logger.info("Getting RandomNumberResult from database RNO=" + rno);

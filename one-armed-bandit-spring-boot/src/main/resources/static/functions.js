@@ -1,4 +1,9 @@
-var ws;
+var stompClient = null;
+
+/*window.onbeforeunload = function () {
+    console.log('cokolwiek');
+    return "Do you really want to close?";
+};*/
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
@@ -11,34 +16,55 @@ function setConnected(connected) {
     $("#greetings").html("");
 }
 
+var rno;
+var token;
 function connect() {
-    ws = new WebSocket('ws://localhost:8080/game');
-    ws.onopen = function () {
-        var data = JSON.stringify(
-            {'winLinesSelected': winLinesSelected, 'reelsSelected': reelsSelected});
-        ws.send(data);
-    };
-    ws.onmessage = function (data) {
-        showGreeting(data.data);
-    };
-    setConnected(true);
+    var socket = new SockJS('/one-armed-bandit-websocket');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        setConnected(true);
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/game/start-game/' + gameId, function (message) {
+            showMessage(JSON.parse(message.body));
+            rno=JSON.parse(message.body).rno;
+            token=JSON.parse(message.body).authorizationToken;
+        });
+        stompClient.subscribe('/game/spin-game/' + gameId, function (message) {
+            showMessage(JSON.parse(message.body));
+        });
+        stompClient.subscribe('/game/end-game/' + gameId, function (message) {
+            showMessage(JSON.parse(message.body));
+        });
+    });
 }
 
 function disconnect() {
-    if (ws != null) {
-        ws.close();
+    if (stompClient !== null) {
+        stompClient.disconnect();
     }
     setConnected(false);
     console.log("Disconnected");
 }
 
-function sendName() {
-    var data = JSON.stringify({'name': $("#name").val()});
-    ws.send(data);
+function startGame() {
+    var initParams = JSON.stringify(
+        {'winLinesSelected': winLinesSelected, 'reelsSelected': reelsSelected});
+    stompClient.send("/app/start/" + gameId, {}, initParams);
 }
 
-function showGreeting(message) {
-    $("#greetings").append("<tr><td> " + message + "</td></tr>");
+function spinGame() {
+    var bet = document.getElementById("bet").value;
+    rno = rno + 1;
+    var data = JSON.stringify({'rno': rno, 'bet': bet, 'authorizationToken': token});
+    stompClient.send("/app/spin/" + gameId, {}, data);
+}
+
+function endGame() {
+    stompClient.send("/app/end/" + gameId, {}, JSON.stringify({'authorizationToken': token}));
+}
+
+function showMessage(message) {
+    $("#greetings").append("<tr><td>" + JSON.stringify(message) + "</td></tr>");
 }
 
 $(function () {
@@ -51,8 +77,14 @@ $(function () {
     $("#disconnect").click(function () {
         disconnect();
     });
-    $("#send").click(function () {
-        sendName();
+    $("#start").click(function () {
+        startGame();
+    });
+    $("#spin").click(function () {
+        spinGame();
+    });
+    $("#end").click(function () {
+        endGame();
     });
 });
 
@@ -64,7 +96,7 @@ function selectWinLines() {
     for (var i = 0; i < select.length; i++) {
         if (select.options[i].selected) winLinesSelected.push(select.options[i].index);
     }
-    console.log(winLinesSelected);
+    console.log('Selected win lines: ' + winLinesSelected);
 }
 
 var reelsSelected;
@@ -75,11 +107,29 @@ function selectReels() {
     for (var i = 0; i < select.length; i++) {
         if (select.options[i].selected) reelsSelected.push(select.options[i].index);
     }
-    console.log(reelsSelected);
+    console.log('Selected reels: ' + reelsSelected);
 }
 
-var functions = angular.module("AvailableInitConfig", []);
-functions.controller("AvailableInitConfigController", function ($scope, $http) {
+
+var gameId;
+var functions = angular.module("ApplicationConfig", []);
+functions.controller("ApplicationConfigController", function ($scope, $http) {
+
+    $scope.gameId = '';
+
+    getSessionId();
+
+    function getSessionId() {
+        $http({
+            method: 'GET',
+            url: 'gameId'
+        }).then(function successCallback(response) {
+            $scope.gameId = response.data;
+            gameId = $scope.gameId;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
 
     $scope.winLines = [];
     $scope.reels = [];
@@ -93,7 +143,6 @@ functions.controller("AvailableInitConfigController", function ($scope, $http) {
             url: 'winLines'
         }).then(function successCallback(response) {
             $scope.winLines = response.data;
-            console.log($scope.winLines);
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
@@ -105,10 +154,8 @@ functions.controller("AvailableInitConfigController", function ($scope, $http) {
             url: 'reels'
         }).then(function successCallback(response) {
             $scope.reels = response.data;
-            console.log($scope.reels);
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
     }
 });
-

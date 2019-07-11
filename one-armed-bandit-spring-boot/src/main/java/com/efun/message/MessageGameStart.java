@@ -3,7 +3,7 @@ package com.efun.message;
 public class MessageGameStart {
 
     private String status;//
-    private int gameId;//
+    private String gameId;//
     private String authorizationToken;
     private int rno;//
     private String message;
@@ -17,11 +17,11 @@ public class MessageGameStart {
         this.status = status;
     }
 
-    public int getGameId() {
+    public String getGameId() {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
+    public void setGameId(String gameId) {
         this.gameId = gameId;
     }
 
@@ -61,7 +61,7 @@ public class MessageGameStart {
     public String toString() {
         return "MessageGameStart{" +
                 "status='" + status + '\'' +
-                ", gameId=" + gameId +
+                ", gameId='" + gameId + '\'' +
                 ", authorizationToken='" + authorizationToken + '\'' +
                 ", rno=" + rno +
                 ", message='" + message + '\'' +

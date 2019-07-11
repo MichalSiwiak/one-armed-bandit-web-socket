@@ -1,3 +1,4 @@
+/*
 package com.efun.tests;
 
 import com.efun.message.MessageGameStart;
@@ -35,3 +36,4 @@ public class TestsComponent {
 
     }
 }
+*/

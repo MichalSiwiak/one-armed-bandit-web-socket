@@ -5,7 +5,7 @@ import java.util.List;
 public class MessageGameSpin {
 
     private String status;
-    private int gameId;
+    private String gameId;
     private int rno;
     private String message;
     private WinLineData winlineData;
@@ -20,11 +20,11 @@ public class MessageGameSpin {
         this.status = status;
     }
 
-    public int getGameId() {
+    public String getGameId() {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
+    public void setGameId(String gameId) {
         this.gameId = gameId;
     }
 
@@ -72,7 +72,7 @@ public class MessageGameSpin {
     public String toString() {
         return "MessageGameSpin{" +
                 "status='" + status + '\'' +
-                ", gameId=" + gameId +
+                ", gameId='" + gameId + '\'' +
                 ", rno=" + rno +
                 ", message='" + message + '\'' +
                 ", winlineData=" + winlineData +

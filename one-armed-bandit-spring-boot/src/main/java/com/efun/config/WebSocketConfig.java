@@ -1,19 +1,29 @@
 package com.efun.config;
 
-import com.efun.web.SocketHandler;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer   {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-	@Autowired HandshakeInterceptor handshakeInterceptor;
+	@Autowired
+	HandshakeInterceptor handshakeInterceptor;
 
 	@Override
-	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(new SocketHandler(), "/game")
-				.addInterceptors(handshakeInterceptor);
+	public void configureMessageBroker(MessageBrokerRegistry config) {
+		config.enableSimpleBroker("/game");
+		config.setApplicationDestinationPrefixes("/app");
 	}
+
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/one-armed-bandit-websocket")
+				.addInterceptors(handshakeInterceptor)
+				.withSockJS();
+	}
+
 }
