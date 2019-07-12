@@ -10,8 +10,6 @@ import org.springframework.web.socket.config.annotation.*;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-	@Autowired
-	HandshakeInterceptor handshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -22,7 +20,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/one-armed-bandit-websocket")
-				.addInterceptors(handshakeInterceptor)
 				.withSockJS();
 	}
 

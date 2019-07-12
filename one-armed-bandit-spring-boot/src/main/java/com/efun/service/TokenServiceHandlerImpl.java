@@ -5,13 +5,14 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
 @Service
 public class TokenServiceHandlerImpl implements TokenServiceHandler {
 
-    private Set<String> tokens = new HashSet<>();
+    private Set<String> tokens = new CopyOnWriteArraySet<>();
 
     @Override
     public String generateToken(Map<String, MessageGameStart> sessions) {

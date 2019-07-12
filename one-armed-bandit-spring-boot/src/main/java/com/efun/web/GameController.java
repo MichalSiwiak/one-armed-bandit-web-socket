@@ -1,24 +1,26 @@
 package com.efun.web;
 
+import com.efun.entity.GameDto;
 import com.efun.message.*;
+import com.efun.service.GameDtoService;
 import com.efun.service.MessageProviderService;
-import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
@@ -31,13 +33,27 @@ public class GameController {
     @Autowired
     private MessageProviderService messageProviderService;
 
+    @Autowired
+    private GameDtoService gameDtoService;
+
     @RequestMapping(value = "/gameId", produces = MediaType.TEXT_PLAIN_VALUE, method = RequestMethod.GET)
     public ResponseEntity<String> getSessionId(HttpSession session) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         String gameId = simpleDateFormat.format(new Date()) + session.getId();
         String md5HexGameId = DigestUtils.md5Hex(gameId).toUpperCase();
-        System.out.println(md5HexGameId);
         return new ResponseEntity<>(md5HexGameId, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public ResponseEntity<List<GameDto>> getAllGames() {
+        List<GameDto> gameDtoList = gameDtoService.findAll();
+        return new ResponseEntity<>(gameDtoList, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/sessions/{id}", method = RequestMethod.POST)
+    public ResponseEntity<String> getGameId(@PathVariable("id") String id) {
+        System.out.println(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @MessageMapping("/start/{gameId}")
@@ -47,9 +63,23 @@ public class GameController {
         MessageGameStart messageGameStart = messageProviderService
                 .startGame(initParams.getWinLinesSelected(), initParams.getReelsSelected(), gameId);
         logger.info("Message sent to client [Start Game]");
+
+        GameDto gameDto = new GameDto();
+        gameDto.setGameId(gameId);
+        gameDto.setAuthorizationToken(messageGameStart.getAuthorizationToken());
+        gameDto.setWinlineData(messageGameStart.getWinlineData());
+        gameDto.setStartDate(new Date());
+        gameDto.setStatus("STARTED");
+        System.out.println(gameDto.getId());
+
+        logger.info("Saving changes to mongo database ...");
+        gameDtoService.save(gameDto);
+        logger.info("Inserted new record");
+
         return messageGameStart;
     }
 
+    //spin modulo 500 !!!!!!!!!!!!!
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
     public MessageGameSpin spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
@@ -57,6 +87,48 @@ public class GameController {
         MessageGameSpin messageGameSpin =
                 messageProviderService.executeSpin(spinParams.getRno(), spinParams.getBet(), spinParams.getAuthorizationToken());
         logger.info("Message sent to client [Spin]");
+
+        GameDto gameDto = gameDtoService.getOne(gameId);
+        List<Integer> spinList = gameDto.getSpinList();
+
+        if (spinList != null) {
+            spinList.add(messageGameSpin.getRno());
+            gameDto.setSpinList(spinList);
+            gameDto.setNumberOfSpins(spinList.size());
+        } else {
+            spinList = new ArrayList<>();
+            spinList.add(messageGameSpin.getRno());
+            gameDto.setSpinList(spinList);
+            gameDto.setNumberOfSpins(spinList.size());
+        }
+
+        List<Double> winList = gameDto.getWinList();
+        if (winList != null) {
+            winList.add(messageGameSpin.getWin());
+            gameDto.setWinList(winList);
+            gameDto.setSumOfWins(gameDto.getSumOfWins() + messageGameSpin.getWin());
+        } else {
+            winList = new ArrayList<>();
+            winList.add(messageGameSpin.getWin());
+            gameDto.setWinList(winList);
+            gameDto.setSumOfWins(gameDto.getSumOfWins() + messageGameSpin.getWin());
+        }
+
+        gameDto.setStatus("PENDING");
+        gameDto.setLastSpinDate(new Date());
+
+        Document document = new Document();
+        document.put("spinList", gameDto.getSpinList());
+        document.put("numberOfSpins", gameDto.getNumberOfSpins());
+        document.put("winList", gameDto.getWinList());
+        document.put("sumOfWins", gameDto.getSumOfWins());
+        document.put("status", gameDto.getStatus());
+        document.put("lastSpinDate", gameDto.getLastSpinDate());
+
+        logger.info("Saving changes to mongo database ...");
+        gameDtoService.updateOne(gameId, document);
+        logger.info("Changes saved of spin");
+
         return messageGameSpin;
     }
 
@@ -65,7 +137,20 @@ public class GameController {
     public MessageGameEnd endGame(@DestinationVariable String gameId, Map<String, String> tokens) throws Exception {
         logger.info("End game params " + tokens.get("authorizationToken"));
         MessageGameEnd messageGameEnd = messageProviderService.endGame(tokens.get("authorizationToken"));
-        logger.info("Message sent to client [Spin]");
+        logger.info("Message sent to client [END]");
+
+        GameDto gameDto = gameDtoService.getOne(gameId);
+        gameDto.setStatus("CLOSED");
+        gameDto.setEndDate(new Date());
+
+        Document document = new Document();
+        document.put("status", gameDto.getStatus());
+        document.put("endDate", gameDto.getEndDate());
+
+        logger.info("Saving changes to mongo database ...");
+        gameDtoService.updateOne(gameId, document);
+        logger.info("Changes saved of end game");
+
         return messageGameEnd;
     }
 }

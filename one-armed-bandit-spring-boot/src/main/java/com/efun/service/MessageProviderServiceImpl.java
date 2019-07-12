@@ -4,12 +4,11 @@ import com.efun.config.GameConfig;
 import com.efun.entity.RandomNumberResult;
 import com.efun.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 @Service
@@ -32,7 +31,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     @Autowired
     private TokenServiceHandler tokenServiceHandler;
 
-    private Map<String, MessageGameStart> sessions = new HashMap<>();
+    private Map<String, MessageGameStart> sessions = new ConcurrentHashMap<>();
 
     //checking List<Integer> winLines to implement !!!
     //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
@@ -40,7 +39,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
 
 
-        if (sessions.size() > maxGameNumber) {
+        if (sessions.size() > maxGameNumber - 1) {
 
             MessageGameStart messageGameStart = new MessageGameStart();
             messageGameStart.setStatus("ERROR"); // statuses and messages should be maintained in some enum class !!
@@ -198,7 +197,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             MessageGameEnd messageGameEnd = new MessageGameEnd();
 
             messageGameEnd.setGameId(messageGameStart.getGameId());
-            messageGameEnd.setStatus(messageGameStart.getStatus());
+            messageGameEnd.setStatus("END");
             messageGameEnd.setRno(messageGameStart.getRno());
             messageGameEnd.setMessage("The game was closed successfully");
 

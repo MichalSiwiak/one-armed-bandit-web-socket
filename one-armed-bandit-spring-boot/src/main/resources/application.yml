@@ -5,7 +5,9 @@ connection_string_localhost: mongodb://localhost:27017/games
 #the upper range of RNO
 max_random_number: 500
 #the maximum number of games supported by server
-max_game_number: 20
+max_game_number: 5
+#collection name os saved gamed ended and pending
+collection_results_of_games: results
 
 ---
 

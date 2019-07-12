@@ -18,14 +18,16 @@
 
         <p>Available win lines</p>
         <form method="post">
-            <select name="Select1" multiple="multiple" size="8" id="winLines-select" onblur="selectWinLines()" ;>
+            <select name="Select1" multiple="multiple" size="8" id="winLines-select" ng-click="selectWinLines()" ;>
                 <option ng-repeat="line in winLines" id="{{line.index}}">{{line.name}}</option>
             </select>
         </form>
 
+        <a href="sessions.html">test</a>
+
         <p>Available reels (please select minimum 3)</p>
         <form method="post">
-            <select name="Select1" multiple="multiple" size="8" id="reels-select" onblur="selectReels()" ;>
+            <select name="Select1" multiple="multiple" size="8" id="reels-select" ng-click="selectReels()" ;>
                 <option ng-repeat="reel in reels" id="{{reel.index}}">{{reel.name}}</option>
             </select>
         </form>
@@ -36,9 +38,11 @@
                 <div class="form-group">
                     <label for="connect">WebSocket  connection:</label>
                     <label for="connect">{{gameId}}</label>
+                    <br>
+                    <br>
                     <button id="connect" class="btn btn-default" type="submit">Start Game</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">End Game
-                    </button>
+                 <!--   <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">End Game
+                    </button>-->
                 </div>
             </form>
         </div>
