@@ -1,5 +1,6 @@
 package com.efun.web;
 
+import com.efun.constants.Status;
 import com.efun.entity.GameDto;
 import com.efun.message.*;
 import com.efun.service.GameDtoService;
@@ -12,8 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.socket.WebSocketSession;
@@ -36,6 +36,21 @@ public class GameController {
     @Autowired
     private GameDtoService gameDtoService;
 
+    @GetMapping("/demo-game")
+    public String showTest() {
+        return "game-form.html";
+    }
+
+    @GetMapping("/results")
+    public String showSessions() {
+        return "sessions-form.html";
+    }
+
+    @GetMapping("/description")
+    public String showIndex() {
+        return "description-form.html";
+    }
+
     @RequestMapping(value = "/gameId", produces = MediaType.TEXT_PLAIN_VALUE, method = RequestMethod.GET)
     public ResponseEntity<String> getSessionId(HttpSession session) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -50,10 +65,13 @@ public class GameController {
         return new ResponseEntity<>(gameDtoList, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/sessions/{id}", method = RequestMethod.POST)
-    public ResponseEntity<String> getGameId(@PathVariable("id") String id) {
-        System.out.println(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+    @MessageMapping("/results")
+    @SendTo("/game/results-game")
+    public GameDto updateGame(Map<String, String> tokens) throws Exception {
+        String gameId = tokens.get("gameId");
+        GameDto gameDto = gameDtoService.getOne(gameId);
+        return gameDto;
     }
 
     @MessageMapping("/start/{gameId}")
@@ -69,8 +87,7 @@ public class GameController {
         gameDto.setAuthorizationToken(messageGameStart.getAuthorizationToken());
         gameDto.setWinlineData(messageGameStart.getWinlineData());
         gameDto.setStartDate(new Date());
-        gameDto.setStatus("STARTED");
-        System.out.println(gameDto.getId());
+        gameDto.setStatus(Status.NEW.toString());
 
         logger.info("Saving changes to mongo database ...");
         gameDtoService.save(gameDto);
@@ -79,7 +96,6 @@ public class GameController {
         return messageGameStart;
     }
 
-    //spin modulo 500 !!!!!!!!!!!!!
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
     public MessageGameSpin spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
@@ -113,8 +129,8 @@ public class GameController {
             gameDto.setWinList(winList);
             gameDto.setSumOfWins(gameDto.getSumOfWins() + messageGameSpin.getWin());
         }
-
-        gameDto.setStatus("PENDING");
+        //cannot codec enums :(
+        gameDto.setStatus(Status.ACTIVE.toString());
         gameDto.setLastSpinDate(new Date());
 
         Document document = new Document();
@@ -140,7 +156,7 @@ public class GameController {
         logger.info("Message sent to client [END]");
 
         GameDto gameDto = gameDtoService.getOne(gameId);
-        gameDto.setStatus("CLOSED");
+        gameDto.setStatus(Status.TERMINATED.toString());
         gameDto.setEndDate(new Date());
 
         Document document = new Document();

@@ -1,6 +1,7 @@
 package com.efun.service;
 
 import com.efun.config.GameConfig;
+import com.efun.constants.Status;
 import com.efun.entity.RandomNumberResult;
 import com.efun.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private Map<String, MessageGameStart> sessions = new ConcurrentHashMap<>();
 
     //checking List<Integer> winLines to implement !!!
-    //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
+    //maintain different cases when we choose different number of reels minimal 3 not only equal 3
     @Override
     public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
 
@@ -42,18 +43,17 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         if (sessions.size() > maxGameNumber - 1) {
 
             MessageGameStart messageGameStart = new MessageGameStart();
-            messageGameStart.setStatus("ERROR"); // statuses and messages should be maintained in some enum class !!
+            messageGameStart.setStatus(Status.LIMIT_REACHED); // statuses and messages should be maintained in some enum class !!
             messageGameStart.setMessage("Maximum number of games has been exceeded limit=" + maxGameNumber);
             logger.warning("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
             return messageGameStart;
         } else {
             MessageGameStart messageGameStart = new MessageGameStart();
 
-            List<List<Byte>> reels = gameConfig.getReels();
+            List<List<Integer>> reels = gameConfig.getReels();
             String token = tokenServiceHandler.generateToken(sessions);
 
             messageGameStart.setAuthorizationToken(token);
-            //add method to fill gameId
             messageGameStart.setGameId(gameId);
             logger.info("Generated authorization=" + token);
 
@@ -61,18 +61,22 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
                 RandomNumberResult randomNumberResult = new RandomNumberResult();
                 randomNumberResult.setRandomNumber(i);
-                List<List<Byte>> reelsInRandomNumber = new ArrayList<>();
+                List<List<Integer>> reelsInRandomNumber = new ArrayList<>();
 
                 for (Integer activeReel : activeReels) {
                     Collections.rotate(reels.get(activeReel), gameConfig.getSpin().get(activeReel));
-                    List<Byte> reel = new ArrayList<>(reels.get(activeReel));
+                    List<Integer> reel = new ArrayList<>(reels.get(activeReel));
                     reelsInRandomNumber.add(reel);
                 }
 
-                //checking if is win - the center values in drums are checked
+                //checking if is win - the center values in reels are checked
                 if ((reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(1).get(1)))
                         && (reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(2).get(1)))) {
-                    randomNumberResult.setWin(true);
+
+                    if (winLines.contains(reelsInRandomNumber.get(0).get(1))) {
+                        randomNumberResult.setWin(true);
+                    }
+
                 }
 
                 randomNumberResult.setReelsInRandomNumber(reelsInRandomNumber);
@@ -89,7 +93,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             //get only wins elements
             List<RandomNumberResult> wins = gameCacheService.findWins(token);
             if (wins.size() == 0) {
-                messageGameStart.setStatus("ERROR");
+                messageGameStart.setStatus(Status.CONFIGURATION_NOT_ACCEPTED);
                 messageGameStart.setMessage("No wins calculated for this configuration");
                 logger.warning("ERROR - No wins calculated for this configuration");
             } else {
@@ -97,11 +101,11 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 WinLineData winlineData = new WinLineData();
                 winlineData.setQuantity(quantity);
                 List<WinLine> winLinesInResponse = new ArrayList<>();
-                Map<Byte, List<Integer>> positionsMap = new HashMap<>();
+                Map<Integer, List<Integer>> positionsMap = new HashMap<>();
 
                 for (RandomNumberResult win : wins) {
                     //if win it's enough to choose the first index
-                    Byte index = win.getReelsInRandomNumber().get(0).get(1);
+                    Integer index = win.getReelsInRandomNumber().get(0).get(1);
                     if (!positionsMap.containsKey(index)) {
                         List<Integer> positions = new ArrayList<>();
                         positions.add(win.getRandomNumber());
@@ -112,7 +116,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                     }
                 }
 
-                for (Byte index : positionsMap.keySet()) {
+                for (Integer index : positionsMap.keySet()) {
                     WinLine winLine = new WinLine();
                     winLine.setIndex(index);
                     winLine.setMultiply(gameConfig.getWinnings().get(index));
@@ -123,7 +127,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 winlineData.setWinLines(winLinesInResponse);
                 messageGameStart.setWinlineData(winlineData);
 
-                messageGameStart.setStatus("OK");
+                messageGameStart.setStatus(Status.NEW);
                 messageGameStart.setMessage("Game configured successfully");
                 logger.info("Game configured successfully");
                 logger.info("Full response: " + messageGameStart);
@@ -134,11 +138,16 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     }
 
     @Override
-    //maintain situation when rno > maxRno !!!
     //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
     public MessageGameSpin executeSpin(int rno, int bet, String token) {
 
         if (tokenServiceHandler.authorizeRequest(token)) {
+
+            // situation when rno is f.e. 501 then we get rno=1
+            if (rno > maxRno) {
+                rno = rno % maxRno;
+            }
+
             MessageGameStart messageGameStart = sessions.get(token);
             MessageGameSpin messageGameSpin = new MessageGameSpin();
 
@@ -150,16 +159,16 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             logger.info("Getting RandomNumberResult from database RNO=" + rno);
             RandomNumberResult randomNumberResult = gameCacheService.getOne(rno, token);
 
-            List<List<Byte>> symbols = new ArrayList<>();
-            List<Byte> reel1 = randomNumberResult.getReelsInRandomNumber().get(0).subList(0, 3);
+            List<List<Integer>> symbols = new ArrayList<>();
+            List<Integer> reel1 = randomNumberResult.getReelsInRandomNumber().get(0).subList(0, 3);
             symbols.add(reel1);
-            List<Byte> reel2 = randomNumberResult.getReelsInRandomNumber().get(1).subList(0, 3);
+            List<Integer> reel2 = randomNumberResult.getReelsInRandomNumber().get(1).subList(0, 3);
             symbols.add(reel2);
-            List<Byte> reel3 = randomNumberResult.getReelsInRandomNumber().get(2).subList(0, 3);
+            List<Integer> reel3 = randomNumberResult.getReelsInRandomNumber().get(2).subList(0, 3);
             symbols.add(reel3);
             messageGameSpin.setSymbols(symbols);
 
-            Byte index = randomNumberResult.getReelsInRandomNumber().get(0).get(1);
+            Integer index = randomNumberResult.getReelsInRandomNumber().get(0).get(1);
 
             double winValue;
 
@@ -170,7 +179,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             }
 
             messageGameSpin.setWin(winValue);
-            messageGameSpin.setStatus("OK");
+            messageGameSpin.setStatus(Status.ACTIVE);
             messageGameSpin.setMessage("Spin executed successfully");
             logger.info("Spin executed successfully RNO=" + rno + " Win=" + winValue);
             logger.info("Full response: " + messageGameSpin);
@@ -181,7 +190,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         } else {
 
             MessageGameSpin messageGameSpin = new MessageGameSpin();
-            messageGameSpin.setStatus("ERROR");
+            messageGameSpin.setStatus(Status.UNAUTHORIZED);
             messageGameSpin.setMessage("Unknown authorization of game");
             logger.warning("ERROR - Unknown authorization of game");
 
@@ -197,7 +206,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             MessageGameEnd messageGameEnd = new MessageGameEnd();
 
             messageGameEnd.setGameId(messageGameStart.getGameId());
-            messageGameEnd.setStatus("END");
+            messageGameEnd.setStatus(Status.TERMINATED);
             messageGameEnd.setRno(messageGameStart.getRno());
             messageGameEnd.setMessage("The game was closed successfully");
 
@@ -212,7 +221,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         } else {
 
             MessageGameEnd messageGameEnd = new MessageGameEnd();
-            messageGameEnd.setStatus("ERROR");
+            messageGameEnd.setStatus(Status.UNAUTHORIZED);
             messageGameEnd.setMessage("Unknown authorization of game");
             logger.warning("ERROR - Unknown authorization of game");
 
@@ -225,8 +234,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         return sessions;
     }
 
-    //check closures in this method!!!
-    private static int getRandomNumberInRange(int min, int max) {
+    public static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("Max must be greater than min");
         }

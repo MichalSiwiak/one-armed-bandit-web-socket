@@ -25,6 +25,24 @@ public class GameDto {
     //in all statuses
     private String status;
 
+    @Override
+    public String toString() {
+        return "GameDto{" +
+                "id=" + id +
+                ", gameId='" + gameId + '\'' +
+                ", authorizationToken='" + authorizationToken + '\'' +
+                ", winlineData=" + winlineData +
+                ", spinList=" + spinList +
+                ", numberOfSpins=" + numberOfSpins +
+                ", winList=" + winList +
+                ", sumOfWins=" + sumOfWins +
+                ", startDate=" + startDate +
+                ", lastSpinDate=" + lastSpinDate +
+                ", endDate=" + endDate +
+                ", status=" + status +
+                '}';
+    }
+
     public ObjectId getId() {
         return id;
     }
@@ -97,6 +115,14 @@ public class GameDto {
         this.startDate = startDate;
     }
 
+    public Date getLastSpinDate() {
+        return lastSpinDate;
+    }
+
+    public void setLastSpinDate(Date lastSpinDate) {
+        this.lastSpinDate = lastSpinDate;
+    }
+
     public Date getEndDate() {
         return endDate;
     }
@@ -111,31 +137,5 @@ public class GameDto {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Date getLastSpinDate() {
-        return lastSpinDate;
-    }
-
-    public void setLastSpinDate(Date lastSpinDate) {
-        this.lastSpinDate = lastSpinDate;
-    }
-
-    @Override
-    public String toString() {
-        return "GameDto{" +
-                "id=" + id +
-                ", gameId='" + gameId + '\'' +
-                ", authorizationToken='" + authorizationToken + '\'' +
-                ", winlineData=" + winlineData +
-                ", spinList=" + spinList +
-                ", numberOfSpins=" + numberOfSpins +
-                ", winList=" + winList +
-                ", sumOfWins=" + sumOfWins +
-                ", startDate=" + startDate +
-                ", lastSpinDate=" + lastSpinDate +
-                ", endDate=" + endDate +
-                ", status='" + status + '\'' +
-                '}';
     }
 }

@@ -12,7 +12,7 @@ public class RandomNumberResult {
 
     private ObjectId id;
     private int randomNumber;
-    private List<List<Byte>> reelsInRandomNumber;
+    private List<List<Integer>> reelsInRandomNumber;
     private boolean win;
 
     public ObjectId getId() {
@@ -31,11 +31,11 @@ public class RandomNumberResult {
         this.randomNumber = randomNumber;
     }
 
-    public List<List<Byte>> getReelsInRandomNumber() {
+    public List<List<Integer>> getReelsInRandomNumber() {
         return reelsInRandomNumber;
     }
 
-    public void setReelsInRandomNumber(List<List<Byte>> reelsInRandomNumber) {
+    public void setReelsInRandomNumber(List<List<Integer>> reelsInRandomNumber) {
         this.reelsInRandomNumber = reelsInRandomNumber;
     }
 

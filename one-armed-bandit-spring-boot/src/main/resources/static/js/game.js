@@ -1,53 +1,36 @@
-var functions = angular.module("ApplicationConfig", []);
-functions.controller("ApplicationConfigController", function ($scope, $http, $timeout) {
+var game = angular.module("ApplicationConfig", []);
+game.controller("ApplicationConfigController", function ($scope, $http, $timeout) {
 
     var stompClient = null;
 
-    /*window.onbeforeunload = function () {
-        console.log('cokolwiek');
-        return "Do you really want to close?";
-    };*/
-
-    $("#connect").prop("disabled", false);
-    $("#start").prop("disabled", true);
-    $("#spin").prop("disabled", true);
-    $("#end").prop("disabled", true);
-    $("#bet").prop("disabled", true);
-    $("#winLines-select").prop("disabled", true);
-    $("#reels-select").prop("disabled", true);
-    $("#conversation").show();
-
-    /*function setConnected(connected) {
-
-        $("#start").prop("disabled", !connected);
-        $("#spin").prop("disabled", !connected);
-        $("#connect").prop("disabled", connected);
-        $("#end").prop("disabled", !connected);
-        $("#bet").prop("disabled", !connected);
-        $("#winLines-select").prop("disabled", !connected);
-        $("#reels-select").prop("disabled", !connected);
-    }*/
+    setConnectedFalse();
+    setIkons();
 
     var rno;
     var token;
+    var symbols;
 
     function connect() {
         getSessionId();
         var socket = new SockJS('/one-armed-bandit-websocket');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
+
             $("#start").prop("disabled", false);
             $("#winLines-select").prop("disabled", false);
             $("#reels-select").prop("disabled", false);
+            $("#connect").prop("disabled", true);
 
             console.log('Connected: ' + frame);
             stompClient.subscribe('/game/start-game/' + gameId, function (message) {
-                showMessage(JSON.parse(message.body));
                 rno = JSON.parse(message.body).rno;
                 token = JSON.parse(message.body).authorizationToken;
+                showMessage(JSON.parse(message.body));
             });
             stompClient.subscribe('/game/spin-game/' + gameId, function (message) {
                 showMessage(JSON.parse(message.body));
+                symbols = JSON.parse(message.body).symbols;
+                updateIkons(symbols);
             });
             stompClient.subscribe('/game/end-game/' + gameId, function (message) {
                 showMessage(JSON.parse(message.body));
@@ -59,44 +42,26 @@ functions.controller("ApplicationConfigController", function ($scope, $http, $ti
         if (stompClient !== null) {
             stompClient.disconnect();
         }
-
-        $("#start").prop("disabled", true);
-        $("#winLines-select").prop("disabled", true);
-        $("#reels-select").prop("disabled", true);
-        $("#connect").prop("disabled", false);
-        $("#spin").prop("disabled", true);
-        $("#end").prop("disabled", true);
-        $("#bet").prop("disabled", true);
-
         console.log("Disconnected");
     }
 
     function startGame() {
-
-        $("#start").prop("disabled", true);
-        $("#winLines-select").prop("disabled", true);
-        $("#reels-select").prop("disabled", true);
-        $("#connect").prop("disabled", true);
-        $("#spin").prop("disabled", false);
-        $("#end").prop("disabled", false);
-        $("#bet").prop("disabled", false);
         if (reelsSelected.length == 3) {
             var initParams = JSON.stringify(
                 {'winLinesSelected': winLinesSelected, 'reelsSelected': reelsSelected});
             stompClient.send("/app/start/" + gameId, {}, initParams);
-            console.log('ok');
+            setConnectedTrue();
         } else {
             alert("Please select exactly 3 numbers of reels!");
-
             $("#start").prop("disabled", false);
             $("#winLines-select").prop("disabled", false);
             $("#reels-select").prop("disabled", false);
-            $("#connect").prop("disabled", false);
-            $("#spin").prop("disabled", true);
-            $("#end").prop("disabled", true);
-            $("#bet").prop("disabled", true);
+            $("#connect").prop("disabled", true);
         }
 
+        $timeout(function () {
+            updateGame()
+        }, 1000);
     }
 
     function spinGame() {
@@ -104,30 +69,91 @@ functions.controller("ApplicationConfigController", function ($scope, $http, $ti
         rno = rno + 1;
         var data = JSON.stringify({'rno': rno, 'bet': bet, 'authorizationToken': token});
         stompClient.send("/app/spin/" + gameId, {}, data);
+        $timeout(function () {
+            updateGame()
+        }, 1000);
+
     }
 
     function endGame() {
         stompClient.send("/app/end/" + gameId, {}, JSON.stringify({'authorizationToken': token}));
+        $timeout(function () {
+            updateGame()
+        }, 1000);
     }
 
+    function updateGame() {
+        stompClient.send("/app/results", {}, JSON.stringify({'gameId': gameId}));
+    }
+
+
     function showMessage(message) {
-        $("#greetings").append("<tr><td>" + JSON.stringify(message) + "</td></tr>");
-        var status = JSON.stringify(message.status);
-        if (status == '"END"') {
-            $("#start").prop("disabled", true);
-            $("#winLines-select").prop("disabled", true);
-            $("#reels-select").prop("disabled", true);
-            $("#connect").prop("disabled", false);
-            $("#spin").prop("disabled", true);
-            $("#end").prop("disabled", true);
-            $("#bet").prop("disabled", true);
+
+        $("#gameId").text(message.gameId);
+        $("#token").text(token);
+        $("#status").text(message.status);
+        $("#message").text(message.message);
+        $("#winLines").text(JSON.stringify(message.winlineData));
+        $("#symbols").text(JSON.stringify(message.symbols));
+        $("#win").text(message.win);
+        $("#rno").text(message.rno);
+
+        $("#connect").val();
+        if (message.status == 'TERMINATED') {
+            setIkons();
+            setConnectedFalse();
         }
+
+    }
+
+    function updateIkons(symbols) {
+        $("#icon1").attr("src", '/img/' + symbols[0][0] + '.png');
+        $("#icon2").attr("src", '/img/' + symbols[1][0] + '.png');
+        $("#icon3").attr("src", '/img/' + symbols[2][0] + '.png');
+
+        $("#icon4").attr("src", '/img/' + symbols[0][1] + '.png');
+        $("#icon5").attr("src", '/img/' + symbols[1][1] + '.png');
+        $("#icon6").attr("src", '/img/' + symbols[2][1] + '.png');
+
+        $("#icon7").attr("src", '/img/' + symbols[0][2] + '.png');
+        $("#icon8").attr("src", '/img/' + symbols[1][2] + '.png');
+        $("#icon9").attr("src", '/img/' + symbols[2][2] + '.png');
+    }
+
+    function setIkons() {
+        $("#icon1").attr("src", '/img/0.png');
+        $("#icon2").attr("src", '/img/0.png');
+        $("#icon3").attr("src", '/img/0.png');
+        $("#icon4").attr("src", '/img/4.png');
+        $("#icon5").attr("src", '/img/4.png');
+        $("#icon6").attr("src", '/img/4.png');
+        $("#icon7").attr("src", '/img/3.png');
+        $("#icon8").attr("src", '/img/3.png');
+        $("#icon9").attr("src", '/img/3.png');
+
+    }
+
+    function setConnectedTrue() {
+        $("#start").prop("disabled", true);
+        $("#winLines-select").prop("disabled", true);
+        $("#reels-select").prop("disabled", true);
+        $("#connect").prop("disabled", true);
+        $("#spin").prop("disabled", false);
+        $("#end").prop("disabled", false);
+        $("#bet").prop("disabled", false);
+    }
+
+    function setConnectedFalse() {
+        $("#connect").prop("disabled", false);
+        $("#start").prop("disabled", true);
+        $("#spin").prop("disabled", true);
+        $("#end").prop("disabled", true);
+        $("#bet").prop("disabled", true);
+        $("#winLines-select").prop("disabled", true);
+        $("#reels-select").prop("disabled", true);
     }
 
     $(function () {
-        $("form").on('submit', function (e) {
-            e.preventDefault();
-        });
         $("#connect").click(function () {
             connect();
         });
@@ -144,8 +170,7 @@ functions.controller("ApplicationConfigController", function ($scope, $http, $ti
             endGame();
             $timeout(function () {
                 disconnect()
-            }, 500);
-            $("#end").prop("disabled", false);
+            }, 2000);
         });
     });
 
@@ -173,15 +198,12 @@ functions.controller("ApplicationConfigController", function ($scope, $http, $ti
 
     var gameId;
 
-    $scope.gameId = '';
-
     function getSessionId() {
         $http({
             method: 'GET',
             url: 'gameId'
         }).then(function successCallback(response) {
-            $scope.gameId = response.data;
-            gameId = $scope.gameId;
+            gameId = response.data;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });

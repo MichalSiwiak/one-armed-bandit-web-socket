@@ -11,15 +11,15 @@ import java.util.List;
 @ConfigurationProperties("game-config")
 public class GameConfig {
 
-    private List<List<Byte>> reels = new ArrayList<>();
+    private List<List<Integer>> reels = new ArrayList<>();
     private List<Integer> spin = new ArrayList<>();
     private List<Double> winnings = new ArrayList<>();
 
-    public List<List<Byte>> getReels() {
+    public List<List<Integer>> getReels() {
         return reels;
     }
 
-    public void setReels(List<List<Byte>> reels) {
+    public void setReels(List<List<Integer>> reels) {
         this.reels = reels;
     }
 

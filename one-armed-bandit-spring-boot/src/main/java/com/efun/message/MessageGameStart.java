@@ -1,19 +1,21 @@
 package com.efun.message;
 
+import com.efun.constants.Status;
+
 public class MessageGameStart {
 
-    private String status;//
+    private Status status;//
     private String gameId;//
     private String authorizationToken;
     private int rno;//
     private String message;
     private WinLineData winlineData;
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

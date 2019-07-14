@@ -1,6 +1,8 @@
 package com.efun;
 
 import com.efun.config.GameConfig;
+import com.efun.service.MessageProviderService;
+import com.efun.service.MessageProviderServiceImpl;
 import com.efun.service.TokenServiceHandler;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -25,6 +27,7 @@ public class OneArmedBanditSpringBootApplicationTests {
     @Autowired
     TokenServiceHandler tokenServiceHandler;
 
+
     @Test
     public void contextLoads() {
     }
@@ -40,11 +43,11 @@ public class OneArmedBanditSpringBootApplicationTests {
         assertEquals(gameConfig.getReels().size(), gameConfig.getSpin().size());
 
         //now we calculate unique ids from reels:
-        Set<Byte> uniqueIds = new HashSet<>();
-        List<List<Byte>> reels = gameConfig.getReels();
+        Set<Integer> uniqueIds = new HashSet<>();
+        List<List<Integer>> reels = gameConfig.getReels();
 
-        for (List<Byte> reel : reels) {
-            for (Byte id : reel) {
+        for (List<Integer> reel : reels) {
+            for (Integer id : reel) {
                 uniqueIds.add(id);
             }
         }
@@ -76,4 +79,22 @@ public class OneArmedBanditSpringBootApplicationTests {
         tokenServiceHandler.removeToken(token2);
         assertEquals(false, tokenServiceHandler.authorizeRequest(token2));
     }
+
+    @Test
+    public void getRandomNumberInRangeTest() {
+
+        Set<Integer> numbers = new HashSet<>();
+
+        for (int i = 0; i < 1000; i++) {
+            numbers.add(MessageProviderServiceImpl.getRandomNumberInRange(1, 3));
+        }
+
+        assertEquals(true, numbers.contains(1));
+        assertEquals(true, numbers.contains(2));
+        assertEquals(true, numbers.contains(3));
+
+
+    }
+
+
 }

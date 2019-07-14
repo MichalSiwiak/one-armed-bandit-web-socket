@@ -1,22 +1,24 @@
 package com.efun.message;
 
+import com.efun.constants.Status;
+
 import java.util.List;
 
 public class MessageGameSpin {
 
-    private String status;
+    private Status status;
     private String gameId;
     private int rno;
     private String message;
     private WinLineData winlineData;
-    private List<List<Byte>> symbols;
+    private List<List<Integer>> symbols;
     private double win;
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -52,11 +54,11 @@ public class MessageGameSpin {
         this.winlineData = winlineData;
     }
 
-    public List<List<Byte>> getSymbols() {
+    public List<List<Integer>> getSymbols() {
         return symbols;
     }
 
-    public void setSymbols(List<List<Byte>> symbols) {
+    public void setSymbols(List<List<Integer>> symbols) {
         this.symbols = symbols;
     }
 
