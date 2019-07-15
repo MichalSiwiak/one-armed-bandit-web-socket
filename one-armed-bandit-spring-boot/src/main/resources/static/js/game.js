@@ -124,12 +124,12 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
         $("#icon1").attr("src", '/img/0.png');
         $("#icon2").attr("src", '/img/0.png');
         $("#icon3").attr("src", '/img/0.png');
-        $("#icon4").attr("src", '/img/4.png');
-        $("#icon5").attr("src", '/img/4.png');
-        $("#icon6").attr("src", '/img/4.png');
-        $("#icon7").attr("src", '/img/3.png');
-        $("#icon8").attr("src", '/img/3.png');
-        $("#icon9").attr("src", '/img/3.png');
+        $("#icon4").attr("src", '/img/2.png');
+        $("#icon5").attr("src", '/img/2.png');
+        $("#icon6").attr("src", '/img/2.png');
+        $("#icon7").attr("src", '/img/7.png');
+        $("#icon8").attr("src", '/img/7.png');
+        $("#icon9").attr("src", '/img/7.png');
 
     }
 

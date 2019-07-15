@@ -1,3 +1,4 @@
+
 #db connection data sources
 #connection_string_aws: mongodb+srv://msiwiak:test@cluster0-xk3sv.mongodb.net/test?retryWrites=true&w=majority
 connection_string_localhost: mongodb://localhost:27017/games
@@ -8,7 +9,8 @@ max_random_number: 500
 max_game_number: 5
 #collection name os saved gamed ended and pending
 collection_results_of_games: results
-
+server:
+  port: 8090
 ---
 
 # game config
