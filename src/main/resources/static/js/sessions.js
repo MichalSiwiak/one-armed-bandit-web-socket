@@ -6,6 +6,18 @@ functions.controller("SessionConfigController", function ($scope, $http, $timeou
     var stompClient = null;
 
     getAllGames();
+    connect();
+
+    function connect() {
+        socket = new SockJS('/one-armed-bandit-websocket');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/game/results-game', function () {
+                getAllGames();
+            });
+        });
+    }
 
     function getAllGames() {
         $http({
@@ -13,26 +25,9 @@ functions.controller("SessionConfigController", function ($scope, $http, $timeou
             url: 'sessions'
         }).then(function successCallback(response) {
             $scope.games = response.data;
-
-            socket = new SockJS('/one-armed-bandit-websocket');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/game/results-game', function () {
-                    updateGame();
-                });
-            });
-
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
-    }
-
-    function updateGame() {
-        if (stompClient !== null) {
-            stompClient.disconnect();
-        }
-        getAllGames();
     }
 
     $scope.closeGame = function (id, token) {
@@ -41,5 +36,12 @@ functions.controller("SessionConfigController", function ($scope, $http, $timeou
             stompClient.send("/app/results", {}, JSON.stringify({'gameId': id}));
         }, 500);
     };
+
+    /*function updateGame() {
+        if (stompClient !== null) {
+            stompClient.disconnect();
+        }
+        getAllGames();
+    }*/
 
 });

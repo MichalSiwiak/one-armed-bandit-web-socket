@@ -73,14 +73,14 @@ public class GameController {
         GameDto gameDto = gameDtoService.getOne(gameId);
         return gameDto;
     }
+
     /**
      * Method mapping request and responses of web socket when game is creating
      *
-     * @author Michał Siwiak
      * @param @DestinationVariable String gameId
      * @param InitParams initParams
      * @return MessageGameSpin spinGame
-     *
+     * @author Michał Siwiak
      */
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
@@ -90,28 +90,31 @@ public class GameController {
                 .startGame(initParams.getWinLinesSelected(), initParams.getReelsSelected(), gameId);
         logger.info("Message sent to client [Start Game]");
 
-        GameDto gameDto = new GameDto();
-        gameDto.setGameId(gameId);
-        gameDto.setAuthorizationToken(messageGameStart.getAuthorizationToken());
-        gameDto.setWinlineData(messageGameStart.getWinlineData());
-        gameDto.setStartDate(new Date());
-        gameDto.setStatus(Status.NEW.toString());
+        if (messageGameStart.getStatus().equals(Status.NEW)) {
 
-        logger.info("Saving changes to mongo database ...");
-        gameDtoService.save(gameDto);
-        logger.info("Inserted new record");
+            GameDto gameDto = new GameDto();
+            gameDto.setGameId(gameId);
+            gameDto.setAuthorizationToken(messageGameStart.getAuthorizationToken());
+            gameDto.setWinlineData(messageGameStart.getWinlineData());
+            gameDto.setStartDate(new Date());
+            gameDto.setStatus(Status.NEW.toString());
 
+            logger.info("Saving changes to mongo database ...");
+            gameDtoService.save(gameDto);
+            logger.info("Inserted new record");
+        } else {
+            logger.info("Status invalid - no records inserted");
+        }
         return messageGameStart;
     }
 
     /**
      * Method mapping request and responses of web socket when client is executing spins
      *
-     * @author Michał Siwiak
-     * @param @DestinationVariable String gameId
-     * @param SpinParams spinParams
+     * @param gameId
+     * @param spinParams []
      * @return MessageGameSpin spinGame
-     *
+     * @author Michał Siwiak
      */
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
@@ -168,11 +171,10 @@ public class GameController {
     /**
      * Method mapping request and responses of web socket when game is closing
      *
-     * @author Michał Siwiak
      * @param @DestinationVariable String gameId
-     * @param Map<String, String> tokens [authorization]
-     * @return  MessageGameEnd endGame
-     *
+     * @param tokens<String,       String> tokens
+     * @return MessageGameEnd endGame
+     * @author Michał Siwiak
      */
     @MessageMapping("/end/{gameId}")
     @SendTo("/game/end-game/{gameId}")
