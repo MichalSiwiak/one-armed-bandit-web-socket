@@ -73,7 +73,15 @@ public class GameController {
         GameDto gameDto = gameDtoService.getOne(gameId);
         return gameDto;
     }
-
+    /**
+     * Method mapping request and responses of web socket when game is creating
+     *
+     * @author Michał Siwiak
+     * @param @DestinationVariable String gameId
+     * @param InitParams initParams
+     * @return MessageGameSpin spinGame
+     *
+     */
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
     public MessageGameStart startGame(@DestinationVariable String gameId, InitParams initParams) throws Exception {
@@ -96,6 +104,15 @@ public class GameController {
         return messageGameStart;
     }
 
+    /**
+     * Method mapping request and responses of web socket when client is executing spins
+     *
+     * @author Michał Siwiak
+     * @param @DestinationVariable String gameId
+     * @param SpinParams spinParams
+     * @return MessageGameSpin spinGame
+     *
+     */
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
     public MessageGameSpin spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
@@ -148,6 +165,15 @@ public class GameController {
         return messageGameSpin;
     }
 
+    /**
+     * Method mapping request and responses of web socket when game is closing
+     *
+     * @author Michał Siwiak
+     * @param @DestinationVariable String gameId
+     * @param Map<String, String> tokens [authorization]
+     * @return  MessageGameEnd endGame
+     *
+     */
     @MessageMapping("/end/{gameId}")
     @SendTo("/game/end-game/{gameId}")
     public MessageGameEnd endGame(@DestinationVariable String gameId, Map<String, String> tokens) throws Exception {

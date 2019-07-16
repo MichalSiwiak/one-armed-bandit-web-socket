@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Auxiliary  Class represents one win line.
- *
+ * @author Michał Siwiak
  */
 
 public class WinLine {

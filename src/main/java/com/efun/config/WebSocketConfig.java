@@ -6,6 +6,8 @@ import org.springframework.web.socket.config.annotation.*;
 
 /**
  * Class represents socket configuration
+ * @author Michał Siwiak
+ *
  */
 @Configuration
 @EnableWebSocketMessageBroker

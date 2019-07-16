@@ -103,6 +103,14 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             setIkons();
             setConnectedFalse();
         }
+        if (message.status == 'CONFIGURATION_NOT_ACCEPTED') {
+            setIkons();
+            setConnectedFalse();
+        }
+        if (message.status == 'UNAUTHORIZED') {
+            setIkons();
+            setConnectedFalse();
+        }
 
     }
 

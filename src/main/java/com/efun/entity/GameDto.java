@@ -10,6 +10,7 @@ import java.util.List;
  * gameId and authorizationToken have simple implementation:
  * Their values are build using md5 algorithm contains actual time,
  * session id and size of sessions.
+ * @author Michał Siwiak
  */
 
 public class GameDto {

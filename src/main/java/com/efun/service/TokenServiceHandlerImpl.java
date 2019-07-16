@@ -14,6 +14,15 @@ public class TokenServiceHandlerImpl implements TokenServiceHandler {
 
     private Set<String> tokens = new CopyOnWriteArraySet<>();
 
+    /**
+     * Method generating authorization token using md5 algorithm
+     * using date and size of sessions
+     *
+     * @author Michał Siwiak
+     * @param Map<String, MessageGameStart> sessions - map holding current sessions
+     * @return String - authorization token
+     *
+     */
     @Override
     public String generateToken(Map<String, MessageGameStart> sessions) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -23,11 +32,28 @@ public class TokenServiceHandlerImpl implements TokenServiceHandler {
         return md5Hex;
     }
 
+    /**
+     * Method to authorize request by checking token in set.
+     *
+     * @author Michał Siwiak
+     * @param String token
+     * @return boolean true when authorization is positive or false when not
+     *
+     */
+
     @Override
     public boolean authorizeRequest(String token) {
         return tokens.contains(token);
     }
 
+
+    /**
+     * Method removing token when game is closed
+     *
+     * @author Michał Siwiak
+     * @param String token
+     *
+     */
     @Override
     public void removeToken(String token) {
         tokens.remove(token);

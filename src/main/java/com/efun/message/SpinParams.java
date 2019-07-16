@@ -2,7 +2,7 @@ package com.efun.message;
 
 /**
  * Class represents parameters when client want to execute spin.
- *
+ * @author Michał Siwiak
  */
 public class SpinParams {
 

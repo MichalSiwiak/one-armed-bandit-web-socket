@@ -10,6 +10,7 @@ import java.util.Objects;
  * Class represents one result and positions of reels in Random Numbers (rno)
  * This is temporary creating in some database when client started game
  * and and it is removed when game is closed.
+ * @author Michał Siwiak
  */
 @Component
 public class RandomNumberResult {

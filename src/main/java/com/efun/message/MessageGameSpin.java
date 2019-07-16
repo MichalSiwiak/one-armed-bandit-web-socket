@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Class represents message when client executes spins.
- *
+ * @author Michał Siwiak
  */
 public class MessageGameSpin {
 

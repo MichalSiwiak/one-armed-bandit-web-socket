@@ -7,7 +7,7 @@ max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 5
 #collection name os saved gamed ended and pending
-database_name: games
+database_name: local
 collection_results_of_games: results
 server:
   port: 8090

@@ -3,6 +3,7 @@ package com.efun.constants;
 
 /**
  * Class representing application statuses:
+ * @author Michał Siwiak
  *
  * NEW: when game was created successfully without any errors.
  * ACTIVE: when game is active and client send at least one spin.

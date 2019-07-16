@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Configuration of static handler of resources
+ * @author Michał Siwiak
  */
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {

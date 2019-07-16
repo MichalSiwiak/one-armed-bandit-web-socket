@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * Class represents configuration file
+ * @author Michał Siwiak
+ *
  */
 @Component
 @ConfigurationProperties("game-config")

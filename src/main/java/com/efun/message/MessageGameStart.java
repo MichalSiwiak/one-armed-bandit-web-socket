@@ -4,7 +4,7 @@ import com.efun.constants.Status;
 
 /**
  * Class represents message when client creates game
- *
+ * @author Michał Siwiak
  */
 public class MessageGameStart {
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Auxiliary  Class represents win line data.
- *
+ * @author Michał Siwiak
  */
 public class WinLineData {
 

@@ -18,6 +18,15 @@ public class AvailableInitConfigController {
     @Autowired
     GameConfig gameConfig;
 
+    /**
+     * Method mapped to address /winLines and sending
+     * json representation of available win lines.
+     * Method use game config in yaml file
+     *
+     * @author Michał Siwiak
+     * @return ResponseEntity<List<AvailableInitConfig>> Json response of available win Lines
+     *
+     */
     @RequestMapping(value = "/winLines", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<List<AvailableInitConfig>> getWinLines() {
 
@@ -28,6 +37,15 @@ public class AvailableInitConfigController {
         return new ResponseEntity<>(winLines, HttpStatus.OK);
     }
 
+    /**
+     * Method mapped to address /reels and sending
+     * json representation of available reels
+     * Method use game config in yaml file
+     *
+     * @author Michał Siwiak
+     * @return ResponseEntity<List<AvailableInitConfig>> Json response of available reels
+     *
+     */
     @RequestMapping(value = "/reels", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<List<AvailableInitConfig>> getReels() {
 

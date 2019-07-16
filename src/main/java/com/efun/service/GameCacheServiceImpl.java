@@ -21,6 +21,16 @@ public class GameCacheServiceImpl implements GameCacheService {
     @Autowired
     private MongoDatabase mongoDataSource;
 
+    /**
+     * Method returning all spins from temporary table of created game
+     * from mongo database
+     *
+     * @author Michał Siwiak
+     * @param String sessionId - generated sessionId of the game using md5
+     * @return List<RandomNumberResult> list of total spins
+     *
+     */
+
     @Override
     public List<RandomNumberResult> findAll(String sessionId) {
         MongoCollection<RandomNumberResult> collection = mongoDataSource
@@ -38,6 +48,16 @@ public class GameCacheServiceImpl implements GameCacheService {
 
     }
 
+    /**
+     * Method filtering only WIN spins from total spins using
+     * temporary table of created game from mongo database
+     *
+     * @author Michał Siwiak
+     * @param String sessionId - generated sessionId of the game using md5
+     * @return List<RandomNumberResult> list of WIN spins
+     *
+     */
+
     @Override
     public List<RandomNumberResult> findWins(String sessionId) {
         MongoCollection<RandomNumberResult> collection = mongoDataSource
@@ -54,6 +74,14 @@ public class GameCacheServiceImpl implements GameCacheService {
         return results;
     }
 
+    /**
+     * Method saving one spin before game is creating
+     *
+     * @author Michał Siwiak
+     * @param RandomNumberResult randomNumberResult - saved spin
+     * @param String sessionId - generated sessionId of the game using md5
+     *
+     */
     @Override
     public void save(RandomNumberResult randomNumberResult, String sessionId) {
         MongoCollection<RandomNumberResult> collection = mongoDataSource
@@ -72,6 +100,13 @@ public class GameCacheServiceImpl implements GameCacheService {
         return randomNumber;
     }
 
+    /**
+     * Method removing all temporary data of spins when game is closing
+     *
+     * @author Michał Siwiak
+     * @param String sessionId - generated sessionId of the game using md5
+     *
+     */
     @Override
     public void removeData(String sessionId) {
         MongoCollection<RandomNumberResult> collection = mongoDataSource

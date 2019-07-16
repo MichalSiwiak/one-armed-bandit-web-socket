@@ -27,6 +27,16 @@ public class GameDtoServiceImpl implements GameDtoService {
     @Autowired
     private MongoDatabase mongoDataSource;
 
+    /**
+     * Method returns total list of games
+     * saved in Mongo database
+     * using pojo object GameDto
+     *
+     * @author Michał Siwiak
+     * @return List<GameDto> list of total games
+     *
+     */
+
     @Override
     public List<GameDto> findAll() {
         List<GameDto> gameDtoList = new ArrayList<>();
@@ -40,6 +50,15 @@ public class GameDtoServiceImpl implements GameDtoService {
         return gameDtoList;
     }
 
+    /**
+     * Method saving and editing one game information
+     * when game is creating, updating or closing
+     * using pojo object GameDto
+     *
+     * @author Michał Siwiak
+     * @param GameDto gameDto - game which is updated
+     *
+     */
     @Override
     public void save(GameDto gameDto) {
         MongoCollection<GameDto> collection = mongoDataSource
@@ -47,6 +66,15 @@ public class GameDtoServiceImpl implements GameDtoService {
         collection.insertOne(gameDto);
     }
 
+    /**
+     * Method getting one game information based on gameID
+     * using pojo object GameDto
+     *
+     * @author Michał Siwiak
+     * @param String sessionId - generated sessionId of the game using md5
+     * @return GameDto gameDto
+     *
+     */
     @Override
     public GameDto getOne(String gameId) {
         MongoCollection<GameDto> collection = mongoDataSource
@@ -58,6 +86,15 @@ public class GameDtoServiceImpl implements GameDtoService {
         return gameDto;
     }
 
+    /**
+     * Method updating one game information based on gameID
+     * using pojo object GameDto
+     *
+     * @author Michał Siwiak
+     * @param String sessionId - generated sessionId of the game using md5
+     * @param Document document - editing object using class Document
+     *
+     */
     @Override
     public void updateOne(String gameId, Document document) {
         Bson filter = Filters.eq("gameId", gameId);

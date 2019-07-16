@@ -29,6 +29,7 @@ public class DBConfig {
     /**
      * Bean represents connection to mongo with database
      * named in configuration file.
+     * @author Michał Siwiak
      *
      * @return MongoDatabase instance.
      */
