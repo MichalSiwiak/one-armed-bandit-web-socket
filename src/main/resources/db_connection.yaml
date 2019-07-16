@@ -1,4 +1,0 @@
----
-# db connection data sources
-connection_string_aws: mongodb+srv://msiwiak:test@cluster0-xk3sv.mongodb.net/test?retryWrites=true&w=majority
-connection_string_localhost: mongodb://localhost:27017/games

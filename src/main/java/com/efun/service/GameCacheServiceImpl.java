@@ -23,7 +23,19 @@ public class GameCacheServiceImpl implements GameCacheService {
 
     @Override
     public List<RandomNumberResult> findAll(String sessionId) {
-        return null;
+        MongoCollection<RandomNumberResult> collection = mongoDataSource
+                .getCollection(sessionId, RandomNumberResult.class);
+        FindIterable<RandomNumberResult> total = collection
+                .withDocumentClass(RandomNumberResult.class)
+                .find();
+
+        List<RandomNumberResult> results = new ArrayList<>();
+
+        for (RandomNumberResult randomNumberResult : total) {
+            results.add(randomNumberResult);
+        }
+        return results;
+
     }
 
     @Override

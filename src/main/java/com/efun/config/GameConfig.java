@@ -1,19 +1,27 @@
 package com.efun.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 import java.util.List;
 
-//class represents configuration file
+/**
+ * Class represents configuration file
+ */
+@Component
+@ConfigurationProperties("game-config")
 public class GameConfig {
 
-    private List<List<Byte>> reels;
-    private List<Integer> spin;
-    private List<Double> winnings;
+    private List<List<Integer>> reels = new ArrayList<>();
+    private List<Integer> spin = new ArrayList<>();
+    private List<Double> winnings = new ArrayList<>();
 
-    public List<List<Byte>> getReels() {
+    public List<List<Integer>> getReels() {
         return reels;
     }
 
-    public void setReels(List<List<Byte>> reels) {
+    public void setReels(List<List<Integer>> reels) {
         this.reels = reels;
     }
 

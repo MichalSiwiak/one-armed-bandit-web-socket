@@ -33,9 +33,9 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private TokenServiceHandler tokenServiceHandler;
 
     private Map<String, MessageGameStart> sessions = new ConcurrentHashMap<>();
+    //temporary collection for testing only
+    private Map<String, String> tokens = new ConcurrentHashMap<>();
 
-    //checking List<Integer> winLines to implement !!!
-    //maintain different cases when we choose different number of reels minimal 3 not only equal 3
     @Override
     public MessageGameStart startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
 
@@ -56,6 +56,8 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             messageGameStart.setAuthorizationToken(token);
             messageGameStart.setGameId(gameId);
             logger.info("Generated authorization=" + token);
+            //for testing only
+            tokens.put(gameId,token);
 
             for (int i = 1; i <= maxRno; i++) {
 
@@ -64,26 +66,26 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 List<List<Integer>> reelsInRandomNumber = new ArrayList<>();
 
                 for (Integer activeReel : activeReels) {
-                    Collections.rotate(reels.get(activeReel), gameConfig.getSpin().get(activeReel));
-                    List<Integer> reel = new ArrayList<>(reels.get(activeReel));
-                    reelsInRandomNumber.add(reel);
+                    List<Integer> movedList = getMovedList(reels.get(activeReel), gameConfig.getSpin().get(activeReel) * i);
+                    reelsInRandomNumber.add(movedList);
                 }
 
-                //checking if is win - the center values in reels are checked
-                if ((reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(1).get(1)))
-                        && (reelsInRandomNumber.get(0).get(1).equals(reelsInRandomNumber.get(2).get(1)))) {
+                int[] middleNumbers = {reelsInRandomNumber.get(0).get(1),
+                        reelsInRandomNumber.get(1).get(1),
+                        reelsInRandomNumber.get(2).get(1)};
 
-                    if (winLines.contains(reelsInRandomNumber.get(0).get(1))) {
+                if (compareEqualityOfNumbers(middleNumbers)) {
+                    //if win it's enough to choose the first index
+                    if (winLines.contains(middleNumbers[0])) {
                         randomNumberResult.setWin(true);
                     }
-
                 }
 
                 randomNumberResult.setReelsInRandomNumber(reelsInRandomNumber);
                 gameCacheService.save(randomNumberResult, token);
                 logger.info("Inserted row: " + randomNumberResult);
             }
-//błąd sprawdzanie powinno być przed zapisywaniem do bazy danych !!!confi
+
             int randomRno = getRandomNumberInRange(1, maxRno);
             logger.info("Getting number of RNO=" + randomRno);
             RandomNumberResult randomNumberResult = gameCacheService.getOne(randomRno, token);
@@ -230,8 +232,25 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
     }
 
-    public Map<String, MessageGameStart> getSessions() {
-        return sessions;
+    public Map<String, String> getTokens() {
+        return tokens;
+    }
+
+    public static boolean compareEqualityOfNumbers(int[] numbers) {
+        int length = numbers.length;
+        for (int i = 0; i < length - 1; i++) {
+            int check = (numbers[0] ^ numbers[i + 1]);
+            if (check != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static List<Integer> getMovedList(List<Integer> numbers, int positions) {
+        List<Integer> moved = new ArrayList<>(numbers);
+        Collections.rotate(moved, positions);
+        return moved;
     }
 
     public static int getRandomNumberInRange(int min, int max) {
