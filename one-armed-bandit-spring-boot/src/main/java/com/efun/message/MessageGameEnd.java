@@ -2,6 +2,10 @@ package com.efun.message;
 
 import com.efun.constants.Status;
 
+/**
+ * Class represents message when client ends the game.
+ *
+ */
 public class MessageGameEnd {
 
     private Status status;

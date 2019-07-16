@@ -1,5 +1,9 @@
 package com.efun.message;
 
+/**
+ * Class represents parameters when client want to execute spin.
+ *
+ */
 public class SpinParams {
 
     private int rno;

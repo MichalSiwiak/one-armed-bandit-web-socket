@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-//class represents configuration file
+/**
+ * Class represents configuration file
+ */
 @Component
 @ConfigurationProperties("game-config")
 public class GameConfig {

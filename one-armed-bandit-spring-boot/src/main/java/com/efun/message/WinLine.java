@@ -2,6 +2,11 @@ package com.efun.message;
 
 import java.util.List;
 
+/**
+ * Auxiliary  Class represents one win line.
+ *
+ */
+
 public class WinLine {
     private int index;
     private List<Integer> positions;

@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 
-// class represents one result and positions of reels in Random Numbers (rno)
+/**
+ * Class represents one result and positions of reels in Random Numbers (rno)
+ * This is temporary creating in some database when client started game
+ * and and it is removed when game is closed.
+ */
 @Component
 public class RandomNumberResult {
 

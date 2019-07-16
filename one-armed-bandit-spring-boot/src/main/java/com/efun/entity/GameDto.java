@@ -5,6 +5,13 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class representing entity of information about all created games.
+ * gameId and authorizationToken have simple implementation:
+ * Their values are build using md5 algorithm contains actual time,
+ * session id and size of sessions.
+ */
+
 public class GameDto {
 
     //in start

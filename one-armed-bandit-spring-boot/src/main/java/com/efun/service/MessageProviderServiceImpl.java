@@ -83,7 +83,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 gameCacheService.save(randomNumberResult, token);
                 logger.info("Inserted row: " + randomNumberResult);
             }
-
+//błąd sprawdzanie powinno być przed zapisywaniem do bazy danych !!!confi
             int randomRno = getRandomNumberInRange(1, maxRno);
             logger.info("Getting number of RNO=" + randomRno);
             RandomNumberResult randomNumberResult = gameCacheService.getOne(randomRno, token);

@@ -2,7 +2,6 @@ package com.efun.web;
 
 import com.efun.config.GameConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,6 @@ public class AvailableInitConfigController {
 
     @Autowired
     GameConfig gameConfig;
-
-    @Value("${max_random_number}")
-    private int maxRno;
-
-    @Value("${max_game_number}")
-    private int maxGameNumber;
 
     @RequestMapping(value = "/winLines", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<List<AvailableInitConfig>> getWinLines() {

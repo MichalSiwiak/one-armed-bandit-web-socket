@@ -2,6 +2,10 @@ package com.efun.message;
 
 import java.util.List;
 
+/**
+ * Auxiliary  Class represents win line data.
+ *
+ */
 public class WinLineData {
 
     private double quantity;

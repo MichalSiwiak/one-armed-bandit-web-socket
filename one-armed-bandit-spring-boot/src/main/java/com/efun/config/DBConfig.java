@@ -22,6 +22,17 @@ public class DBConfig {
     @Value("${connection_string_localhost}")
     private String connectionString;
 
+    @Value("${database_name}")
+    private String databaseName;
+
+
+    /**
+     * Bean represents connection to mongo with database
+     * named in configuration file.
+     *
+     * @return MongoDatabase instance.
+     */
+
     @Bean
     public MongoDatabase mongoDataSource(){
         ConnectionString connString = new ConnectionString(connectionString);
@@ -36,7 +47,7 @@ public class DBConfig {
                 .build();
 
         MongoClient mongoClient = MongoClients.create(settings);
-        MongoDatabase mongoDataSource = mongoClient.getDatabase("games");
+        MongoDatabase mongoDataSource = mongoClient.getDatabase(databaseName);
         return mongoDataSource;
     }
 

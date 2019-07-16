@@ -4,6 +4,10 @@ import com.efun.constants.Status;
 
 import java.util.List;
 
+/**
+ * Class represents message when client executes spins.
+ *
+ */
 public class MessageGameSpin {
 
     private Status status;
