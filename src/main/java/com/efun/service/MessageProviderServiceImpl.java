@@ -40,7 +40,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
     private Map<String, Message> sessions = new ConcurrentHashMap<>();
     //temporary collection for testing only
-    private Map<String, String> tokens = new ConcurrentHashMap<>();
+    //private Map<String, String> tokens = new ConcurrentHashMap<>();
 
     /**
      * Method creating message when game is started
@@ -51,11 +51,11 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * and sending this information to client. Method check also all spin and set it
      * when spin guarantee win or nor using tested static method compareEqualityOfNumbers
      *
-     * @author Michał Siwiak
      * @param List<Integer> winLines - win lines selected by client
      * @param List<Integer> activeReels - active reels selected by client
-     * @param String gameId
+     * @param String        gameId
      * @return MessageGameStart messageGameStart representation of message send to client
+     * @author Michał Siwiak
      */
     @Override
     public Message startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
@@ -71,13 +71,13 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         } else {
             Message message = messageFactory.createMessage(Status.NEW);
             List<List<Integer>> reels = gameConfig.getReels();
-            String token = tokenServiceHandler.generateToken(sessions);
+            String token = tokenServiceHandler.generateToken(gameId, sessions);
 
             message.setAuthorizationToken(token);
             message.setGameId(gameId);
             LOGGER.info("Generated authorization=" + token);
             //for testing only
-            tokens.put(gameId,token);
+            //tokens.put(gameId, token);
 
             for (int i = 1; i <= maxRno; i++) {
 
@@ -171,17 +171,17 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * method gets spin from mongo database using gameCacheService
      * and creating message to client
      *
-     * @author Michał Siwiak
-     * @param int rno - rno sending by client
-     * @param int bet - bet sending by client
+     * @param int    rno - rno sending by client
+     * @param int    bet - bet sending by client
      * @param String token - authorization sending by client
      * @return MessageGameSpin messageGameSpin representation of message send to client
+     * @author Michał Siwiak
      */
     @Override
     //maintain different cases whe we choose different number of reels minimal 3 not only equal 3 !!!!
-    public Message executeSpin(int rno, int bet, String token) {
+    public Message executeSpin(int rno, int bet, String token, String gameId) {
 
-        if (tokenServiceHandler.authorizeRequest(token)) {
+        if (tokenServiceHandler.authorizeRequest(gameId, token, sessions)) {
 
             // situation when rno is f.e. 501 then we get rno=1
             if (rno > maxRno) {
@@ -239,14 +239,14 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * method close game, remove authorization token and drop
      * temporary cash from mongo database
      *
-     * @author Michał Siwiak
      * @param String token - authorization sending by client
      * @return MessageGameEnd messageGameEnd of message send to client
+     * @author Michał Siwiak
      */
     @Override
-    public Message endGame(String token) {
+    public Message endGame(String token, String gameId) {
 
-        if (tokenServiceHandler.authorizeRequest(token)) {
+        if (tokenServiceHandler.authorizeRequest(gameId, token, sessions)) {
             Message messageActive = sessions.get(token);
             Message messageEnd = messageFactory.createMessage(Status.TERMINATED);
 
@@ -270,16 +270,16 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         }
     }
 
-    public Map<String, String> getTokens() {
+    /*public Map<String, String> getTokens() {
         return tokens;
     }
-
+*/
     /**
      * Method checking equality of different elements using XOR logical operator
-     * @author Michał Siwiak
+     *
      * @param int[] numbers - list of numbers to check its equality
      * @return true when all elements equal and false when not
-     *
+     * @author Michał Siwiak
      */
     public static boolean compareEqualityOfNumbers(int[] numbers) {
         int length = numbers.length;
@@ -295,11 +295,10 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     /**
      * Method moving list based on the given items
      *
-     * @author Michał Siwiak
      * @param List<Integer> numbers - list of numbers to move
-     * @param int positions - number of sliding indexes
+     * @param int           positions - number of sliding indexes
      * @return List<Integer> numbers - new list moved by number [positions]
-     *
+     * @author Michał Siwiak
      */
     public static List<Integer> getMovedList(List<Integer> numbers, int positions) {
         List<Integer> moved = new ArrayList<>(numbers);

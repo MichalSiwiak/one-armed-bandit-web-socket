@@ -67,7 +67,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
     function spinGame() {
         var bet = document.getElementById("bet").value;
         rno = rno + 1;
-        var data = JSON.stringify({'rno': rno, 'bet': bet, 'authorizationToken': token});
+        var data = JSON.stringify({'rno': rno, 'bet': bet, 'authorizationToken': token, 'gameId': gameId});
         stompClient.send("/app/spin/" + gameId, {}, data);
         $timeout(function () {
             updateGame()
@@ -76,7 +76,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
     }
 
     function endGame() {
-        stompClient.send("/app/end/" + gameId, {}, JSON.stringify({'authorizationToken': token}));
+        stompClient.send("/app/end/" + gameId, {}, JSON.stringify({'authorizationToken': token, 'gameId': gameId}));
         $timeout(function () {
             updateGame()
         }, 1000);

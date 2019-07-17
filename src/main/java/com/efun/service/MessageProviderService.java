@@ -11,8 +11,8 @@ public interface MessageProviderService {
 
     public Message startGame(List<Integer> winLines, List<Integer> activeReels, String gameId);
 
-    public Message executeSpin(int rno, int bet, String token);
+    public Message executeSpin(int rno, int bet, String token, String gameId);
 
-    public Message endGame(String token);
+    public Message endGame(String token, String gameId);
 
 }

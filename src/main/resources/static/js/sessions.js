@@ -31,7 +31,7 @@ functions.controller("SessionConfigController", function ($scope, $http, $timeou
     }
 
     $scope.closeGame = function (id, token) {
-        stompClient.send("/app/end/" + id, {}, JSON.stringify({'authorizationToken': token}));
+        stompClient.send("/app/end/" + id, {}, JSON.stringify({'authorizationToken': token, 'gameId': id}));
         $timeout(function () {
             stompClient.send("/app/results", {}, JSON.stringify({'gameId': id}));
         }, 500);

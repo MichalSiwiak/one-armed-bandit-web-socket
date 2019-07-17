@@ -6,23 +6,24 @@ package com.efun.message;
  */
 public class SpinParams {
 
-    private int rno;
-    private int bet;
+    private String rno;
+    private String bet;
     private String authorizationToken;
+    private String gameId;
 
-    public int getRno() {
+    public String getRno() {
         return rno;
     }
 
-    public void setRno(int rno) {
+    public void setRno(String rno) {
         this.rno = rno;
     }
 
-    public int getBet() {
+    public String getBet() {
         return bet;
     }
 
-    public void setBet(int bet) {
+    public void setBet(String bet) {
         this.bet = bet;
     }
 
@@ -34,12 +35,21 @@ public class SpinParams {
         this.authorizationToken = authorizationToken;
     }
 
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
     @Override
     public String toString() {
         return "SpinParams{" +
                 "rno=" + rno +
-                ", bet=" + bet +
+                ", bet='" + bet + '\'' +
                 ", authorizationToken='" + authorizationToken + '\'' +
+                ", gameId='" + gameId + '\'' +
                 '}';
     }
 }
