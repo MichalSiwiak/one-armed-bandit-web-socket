@@ -7,7 +7,8 @@ import com.efun.service.GameDtoService;
 import com.efun.service.MessageProviderService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +17,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.socket.WebSocketSession;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
-
 @Controller
 public class GameController {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
     private MessageProviderService messageProviderService;
     private GameDtoService gameDtoService;
 
@@ -85,10 +82,10 @@ public class GameController {
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
     public Message startGame(@DestinationVariable String gameId, InitParams initParams) throws Exception {
-        logger.info("Init params " + initParams.toString());
+        LOGGER.info("Init params " + initParams.toString());
         Message message = messageProviderService
                 .startGame(initParams.getWinLinesSelected(), initParams.getReelsSelected(), gameId);
-        logger.info("Message sent to client [Start Game]");
+        LOGGER.info("Message sent to client [Start Game]");
 
         if (message.getStatus().equals(Status.NEW)) {
 
@@ -99,11 +96,11 @@ public class GameController {
             gameDto.setStartDate(new Date());
             gameDto.setStatus(Status.NEW.toString());
 
-            logger.info("Saving changes to mongo database ...");
+            LOGGER.info("Saving changes to mongo database ...");
             gameDtoService.save(gameDto);
-            logger.info("Inserted new record");
+            LOGGER.info("Inserted new record");
         } else {
-            logger.info("Status invalid - no records inserted");
+            LOGGER.info("Status invalid - no records inserted");
         }
         return message;
     }
@@ -119,10 +116,10 @@ public class GameController {
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
     public Message spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
-        logger.info("Spin params " + spinParams.toString());
+        LOGGER.info("Spin params " + spinParams.toString());
         Message message =
                 messageProviderService.executeSpin(spinParams.getRno(), spinParams.getBet(), spinParams.getAuthorizationToken());
-        logger.info("Message sent to client [Spin]");
+        LOGGER.info("Message sent to client [Spin]");
 
         GameDto gameDto = gameDtoService.getOne(gameId);
         List<Integer> spinList = gameDto.getSpinList();
@@ -161,9 +158,9 @@ public class GameController {
         document.put("status", gameDto.getStatus());
         document.put("lastSpinDate", gameDto.getLastSpinDate());
 
-        logger.info("Saving changes to mongo database ...");
+        LOGGER.info("Saving changes to mongo database ...");
         gameDtoService.updateOne(gameId, document);
-        logger.info("Changes saved of spin");
+        LOGGER.info("Changes saved of spin");
 
         return message;
     }
@@ -179,9 +176,9 @@ public class GameController {
     @MessageMapping("/end/{gameId}")
     @SendTo("/game/end-game/{gameId}")
     public Message endGame(@DestinationVariable String gameId, Map<String, String> tokens) throws Exception {
-        logger.info("End game params " + tokens.get("authorizationToken"));
+        LOGGER.info("End game params " + tokens.get("authorizationToken"));
         Message message = messageProviderService.endGame(tokens.get("authorizationToken"));
-        logger.info("Message sent to client [END]");
+        LOGGER.info("Message sent to client [END]");
 
         GameDto gameDto = gameDtoService.getOne(gameId);
         gameDto.setStatus(Status.TERMINATED.toString());
@@ -191,9 +188,9 @@ public class GameController {
         document.put("status", gameDto.getStatus());
         document.put("endDate", gameDto.getEndDate());
 
-        logger.info("Saving changes to mongo database ...");
+        LOGGER.info("Saving changes to mongo database ...");
         gameDtoService.updateOne(gameId, document);
-        logger.info("Changes saved of end game");
+        LOGGER.info("Changes saved of end game");
 
         return message;
     }

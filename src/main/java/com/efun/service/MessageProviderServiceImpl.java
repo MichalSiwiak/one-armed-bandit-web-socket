@@ -4,18 +4,18 @@ import com.efun.config.GameConfig;
 import com.efun.constants.Status;
 import com.efun.entity.RandomNumberResult;
 import com.efun.message.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 @Service
 public class MessageProviderServiceImpl implements MessageProviderService {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageProviderService.class);
 
     @Value("${max_random_number}")
     private int maxRno;
@@ -65,7 +65,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
             Message messageError = messageFactory.createMessage(Status.LIMIT_REACHED);
             messageError.setMessage(messageError.getStatus().getMessageBody());
-            logger.warning("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
+            LOGGER.warn("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
             return messageError;
 
         } else {
@@ -75,7 +75,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
             message.setAuthorizationToken(token);
             message.setGameId(gameId);
-            logger.info("Generated authorization=" + token);
+            LOGGER.info("Generated authorization=" + token);
             //for testing only
             tokens.put(gameId,token);
 
@@ -103,14 +103,14 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
                 randomNumberResult.setReelsInRandomNumber(reelsInRandomNumber);
                 gameCacheService.save(randomNumberResult, token);
-                logger.info("Inserted row: " + randomNumberResult);
+                LOGGER.info("Inserted row: " + randomNumberResult);
             }
 
             int randomRno = getRandomNumberInRange(1, maxRno);
-            logger.info("Getting number of RNO=" + randomRno);
+            LOGGER.info("Getting number of RNO=" + randomRno);
             RandomNumberResult randomNumberResult = gameCacheService.getOne(randomRno, token);
             message.setRno(randomNumberResult.getRandomNumber());
-            logger.info("The random RNO is=" + randomNumberResult);
+            LOGGER.info("The random RNO is=" + randomNumberResult);
 
             //get only wins elements
             List<RandomNumberResult> wins = gameCacheService.findWins(token);
@@ -145,8 +145,8 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 winlineData.setWinLines(winLinesInResponse);
                 message.setWinlineData(winlineData);
                 message.setMessage(message.getStatus().getMessageBody());
-                logger.info("Game configured successfully");
-                logger.info("Full response: " + message);
+                LOGGER.info("Game configured successfully");
+                LOGGER.info("Full response: " + message);
                 sessions.put(token, message);
 
                 return message;
@@ -155,7 +155,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 Message messageError = messageFactory.createMessage(Status.CONFIGURATION_NOT_ACCEPTED);
                 messageError.setStatus(Status.CONFIGURATION_NOT_ACCEPTED);
                 messageError.setMessage(messageError.getStatus().getMessageBody());
-                logger.warning("ERROR - No wins calculated for this configuration");
+                LOGGER.warn("ERROR - No wins calculated for this configuration");
                 return messageError;
 
             }
@@ -194,8 +194,8 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             messageSpin.setWinlineData(messageStarted.getWinlineData());
 
             messageSpin.setRno(rno);
-            logger.info("Spin was started ... ");
-            logger.info("Getting RandomNumberResult from database RNO=" + rno);
+            LOGGER.info("Spin was started ... ");
+            LOGGER.info("Getting RandomNumberResult from database RNO=" + rno);
             RandomNumberResult randomNumberResult = gameCacheService.getOne(rno, token);
 
             List<List<Integer>> symbols = new ArrayList<>();
@@ -219,15 +219,15 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
             messageSpin.setWin(winValue);
             messageSpin.setMessage(messageSpin.getStatus().getMessageBody());
-            logger.info("Spin executed successfully RNO=" + rno + " Win=" + winValue);
-            logger.info("Full response: " + messageSpin);
+            LOGGER.info("Spin executed successfully RNO=" + rno + " Win=" + winValue);
+            LOGGER.info("Full response: " + messageSpin);
 
             return messageSpin;
 
         } else {
             Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
             messageError.setMessage(messageError.getStatus().getMessageBody());
-            logger.warning("ERROR - Unknown authorization of game");
+            LOGGER.warn("ERROR - Unknown authorization of game");
             return messageError;
         }
     }
@@ -256,16 +256,16 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
             sessions.remove(token);
             tokenServiceHandler.removeToken(token);
-            logger.info("The game was closed successfully");
+            LOGGER.info("The game was closed successfully");
             gameCacheService.removeData(token);
-            logger.info("Databases of game was dropped");
+            LOGGER.info("Databases of game was dropped");
 
             return messageEnd;
 
         } else {
             Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
             messageError.setMessage(messageError.getStatus().getMessageBody());
-            logger.warning("ERROR - Unknown authorization of game");
+            LOGGER.warn("ERROR - Unknown authorization of game");
             return messageError;
         }
     }
