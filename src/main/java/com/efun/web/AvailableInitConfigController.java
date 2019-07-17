@@ -15,8 +15,12 @@ import java.util.List;
 @Controller
 public class AvailableInitConfigController {
 
-    @Autowired
-    GameConfig gameConfig;
+
+    private GameConfig gameConfig;
+
+    public AvailableInitConfigController(GameConfig gameConfig) {
+        this.gameConfig = gameConfig;
+    }
 
     /**
      * Method mapped to address /winLines and sending

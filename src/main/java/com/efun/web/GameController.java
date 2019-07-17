@@ -27,14 +27,14 @@ import java.util.logging.Logger;
 @Controller
 public class GameController {
 
-    List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     private Logger logger = Logger.getLogger(getClass().getName());
-
-    @Autowired
     private MessageProviderService messageProviderService;
-
-    @Autowired
     private GameDtoService gameDtoService;
+
+    public GameController(MessageProviderService messageProviderService, GameDtoService gameDtoService) {
+        this.messageProviderService = messageProviderService;
+        this.gameDtoService = gameDtoService;
+    }
 
     @GetMapping("/demo-game")
     public String showTest() {
@@ -84,18 +84,18 @@ public class GameController {
      */
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
-    public MessageGameStart startGame(@DestinationVariable String gameId, InitParams initParams) throws Exception {
+    public Message startGame(@DestinationVariable String gameId, InitParams initParams) throws Exception {
         logger.info("Init params " + initParams.toString());
-        MessageGameStart messageGameStart = messageProviderService
+        Message message = messageProviderService
                 .startGame(initParams.getWinLinesSelected(), initParams.getReelsSelected(), gameId);
         logger.info("Message sent to client [Start Game]");
 
-        if (messageGameStart.getStatus().equals(Status.NEW)) {
+        if (message.getStatus().equals(Status.NEW)) {
 
             GameDto gameDto = new GameDto();
             gameDto.setGameId(gameId);
-            gameDto.setAuthorizationToken(messageGameStart.getAuthorizationToken());
-            gameDto.setWinlineData(messageGameStart.getWinlineData());
+            gameDto.setAuthorizationToken(message.getAuthorizationToken());
+            gameDto.setWinlineData(message.getWinlineData());
             gameDto.setStartDate(new Date());
             gameDto.setStatus(Status.NEW.toString());
 
@@ -105,7 +105,7 @@ public class GameController {
         } else {
             logger.info("Status invalid - no records inserted");
         }
-        return messageGameStart;
+        return message;
     }
 
     /**
@@ -118,9 +118,9 @@ public class GameController {
      */
     @MessageMapping("/spin/{gameId}")
     @SendTo("/game/spin-game/{gameId}")
-    public MessageGameSpin spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
+    public Message spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
         logger.info("Spin params " + spinParams.toString());
-        MessageGameSpin messageGameSpin =
+        Message message =
                 messageProviderService.executeSpin(spinParams.getRno(), spinParams.getBet(), spinParams.getAuthorizationToken());
         logger.info("Message sent to client [Spin]");
 
@@ -128,26 +128,26 @@ public class GameController {
         List<Integer> spinList = gameDto.getSpinList();
 
         if (spinList != null) {
-            spinList.add(messageGameSpin.getRno());
+            spinList.add(message.getRno());
             gameDto.setSpinList(spinList);
             gameDto.setNumberOfSpins(spinList.size());
         } else {
             spinList = new ArrayList<>();
-            spinList.add(messageGameSpin.getRno());
+            spinList.add(message.getRno());
             gameDto.setSpinList(spinList);
             gameDto.setNumberOfSpins(spinList.size());
         }
 
         List<Double> winList = gameDto.getWinList();
         if (winList != null) {
-            winList.add(messageGameSpin.getWin());
+            winList.add(message.getWin());
             gameDto.setWinList(winList);
-            gameDto.setSumOfWins(gameDto.getSumOfWins() + messageGameSpin.getWin());
+            gameDto.setSumOfWins(gameDto.getSumOfWins() + message.getWin());
         } else {
             winList = new ArrayList<>();
-            winList.add(messageGameSpin.getWin());
+            winList.add(message.getWin());
             gameDto.setWinList(winList);
-            gameDto.setSumOfWins(gameDto.getSumOfWins() + messageGameSpin.getWin());
+            gameDto.setSumOfWins(gameDto.getSumOfWins() + message.getWin());
         }
         //cannot codec enums :(
         gameDto.setStatus(Status.ACTIVE.toString());
@@ -165,7 +165,7 @@ public class GameController {
         gameDtoService.updateOne(gameId, document);
         logger.info("Changes saved of spin");
 
-        return messageGameSpin;
+        return message;
     }
 
     /**
@@ -178,9 +178,9 @@ public class GameController {
      */
     @MessageMapping("/end/{gameId}")
     @SendTo("/game/end-game/{gameId}")
-    public MessageGameEnd endGame(@DestinationVariable String gameId, Map<String, String> tokens) throws Exception {
+    public Message endGame(@DestinationVariable String gameId, Map<String, String> tokens) throws Exception {
         logger.info("End game params " + tokens.get("authorizationToken"));
-        MessageGameEnd messageGameEnd = messageProviderService.endGame(tokens.get("authorizationToken"));
+        Message message = messageProviderService.endGame(tokens.get("authorizationToken"));
         logger.info("Message sent to client [END]");
 
         GameDto gameDto = gameDtoService.getOne(gameId);
@@ -195,6 +195,6 @@ public class GameController {
         gameDtoService.updateOne(gameId, document);
         logger.info("Changes saved of end game");
 
-        return messageGameEnd;
+        return message;
     }
 }

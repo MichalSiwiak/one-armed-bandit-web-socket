@@ -18,14 +18,14 @@ import java.util.List;
 @Service
 public class GameDtoServiceImpl implements GameDtoService {
 
-    @Value("${connection_string_localhost}")
-    private String connectionString;
-
     @Value("${collection_results_of_games}")
     private String collectionResults;
 
-    @Autowired
     private MongoDatabase mongoDataSource;
+
+    public GameDtoServiceImpl(MongoDatabase mongoDataSource) {
+        this.mongoDataSource = mongoDataSource;
+    }
 
     /**
      * Method returns total list of games

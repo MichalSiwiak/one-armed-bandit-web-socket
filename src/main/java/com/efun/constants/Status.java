@@ -21,5 +21,20 @@ package com.efun.constants;
  */
 public enum Status {
 
-    NEW, ACTIVE, TERMINATED, LIMIT_REACHED, CONFIGURATION_NOT_ACCEPTED, UNAUTHORIZED
+    NEW("Game configured successfully"),
+    ACTIVE("Spin executed successfully"),
+    TERMINATED("The game was closed successfully"),
+    LIMIT_REACHED("Maximum number of games has been exceeded"),
+    CONFIGURATION_NOT_ACCEPTED("No wins calculated for this configuration"),
+    UNAUTHORIZED("Unknown authorization of game");
+
+    private String messageBody;
+
+    Status(String messageBody) {
+        this.messageBody = messageBody;
+    }
+
+    public String getMessageBody() {
+        return messageBody;
+    }
 }

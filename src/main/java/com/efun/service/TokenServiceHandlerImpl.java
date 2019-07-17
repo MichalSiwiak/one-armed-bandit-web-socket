@@ -1,5 +1,6 @@
 package com.efun.service;
 
+import com.efun.message.Message;
 import com.efun.message.MessageGameStart;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class TokenServiceHandlerImpl implements TokenServiceHandler {
      *
      */
     @Override
-    public String generateToken(Map<String, MessageGameStart> sessions) {
+    public String generateToken(Map<String, Message> sessions) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         String token = simpleDateFormat.format(new Date()) + sessions.size();
         String md5Hex = DigestUtils.md5Hex(token).toUpperCase();

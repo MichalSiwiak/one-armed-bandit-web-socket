@@ -15,11 +15,11 @@ import java.util.List;
 @Service
 public class GameCacheServiceImpl implements GameCacheService {
 
-    @Value("${connection_string_localhost}")
-    private String connectionString;
-
-    @Autowired
     private MongoDatabase mongoDataSource;
+
+    public GameCacheServiceImpl(MongoDatabase mongoDataSource) {
+        this.mongoDataSource = mongoDataSource;
+    }
 
     /**
      * Method returning all spins from temporary table of created game
