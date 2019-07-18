@@ -18,6 +18,7 @@ public class GameConfig {
     private List<List<Integer>> reels = new ArrayList<>();
     private List<Integer> spin = new ArrayList<>();
     private List<Double> winnings = new ArrayList<>();
+    private List<List<Integer>> wins = new ArrayList<>();
 
     public List<List<Integer>> getReels() {
         return reels;
@@ -43,12 +44,11 @@ public class GameConfig {
         this.winnings = winnings;
     }
 
-    @Override
-    public String toString() {
-        return "GameConfig{" +
-                "reels=" + reels +
-                ", spin=" + spin +
-                ", winnings=" + winnings +
-                '}';
+    public List<List<Integer>> getWins() {
+        return wins;
+    }
+
+    public void setWins(List<List<Integer>> wins) {
+        this.wins = wins;
     }
 }

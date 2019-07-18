@@ -60,7 +60,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     @Override
     public Message startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
 
-
+        System.out.println(activeReels.toString());
         if (sessions.size() > maxGameNumber - 1) {
 
             Message messageError = messageFactory.createMessage(Status.LIMIT_REACHED);
@@ -273,7 +273,8 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     /*public Map<String, String> getTokens() {
         return tokens;
     }
-*/
+    */
+
     /**
      * Method checking equality of different elements using XOR logical operator
      *
