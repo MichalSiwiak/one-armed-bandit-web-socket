@@ -190,7 +190,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             List<Integer> reel3 = randomNumberResult.getReelsInRandomNumber().get(2).subList(0, 3);
             symbols.add(reel3);*/
 
-            messageSpin.setSymbols(reelPositionInCache);
+            messageSpin.setSymbols(checkResultService.getFirst3Symbols(reelPositionInCache));
             boolean win = winCheckerService.isWin(reelPositionInCache, gameConfig.getWins());
             double winInSpin = winCheckerService.getWinInSpin();
 

@@ -73,20 +73,17 @@ public class CheckResultServiceImpl implements CheckResultService {
             }
         }
 
+        return symbols;
+    }
 
+    @Override
+    public List<List<Integer>> getFirst3Symbols(List<List<Integer>> symbols) {
         List<List<Integer>> result = new ArrayList<>();
         for (List<Integer> symbol : symbols) {
-            result.add(symbol.subList(0,3));
+            result.add(symbol.subList(0, 3));
         }
-
         return result;
     }
 
-    @PostConstruct
-    void init() {
 
-
-
-
-    }
 }
