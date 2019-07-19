@@ -16,5 +16,6 @@ public class MessageGameStart extends Message {
         setRno(super.getRno());
         setWinlineData(super.getWinlineData());
         setMessage(super.getMessage());
+        setBalance(super.getBalance());
     }
 }

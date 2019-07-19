@@ -14,6 +14,14 @@ public class RnoInformationServiceImpl implements RnoInformationService {
         return (rno * gameConfigSpin) % listSize;
     }
 
+    /**
+     * Method moving list based on the given items
+     *
+     * @param List<Integer> numbers - list of numbers to move
+     * @param int positions - number of sliding indexes
+     * @return List<Integer> numbers - new list moved by number [positions]
+     * @author Michał Siwiak
+     */
     @Override
     public List<Integer> getMovedList(List<Integer> numbers, int positions) {
         List<Integer> moved = new ArrayList<>(numbers);

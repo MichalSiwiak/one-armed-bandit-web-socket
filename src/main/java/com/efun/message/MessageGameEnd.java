@@ -13,5 +13,6 @@ public class MessageGameEnd extends Message{
         setGameId(super.getGameId());
         setRno(super.getRno());
         setMessage(super.getMessage());
+        setBalance(super.getBalance());
     }
 }

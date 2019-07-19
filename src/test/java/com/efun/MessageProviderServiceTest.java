@@ -2,6 +2,7 @@ package com.efun;
 
 import com.efun.config.GameConfig;
 import com.efun.message.Message;
+import com.efun.message.SpinParams;
 import com.efun.service.CheckResultService;
 import com.efun.service.MessageProviderService;
 import com.efun.service.RnoInformationService;
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import sun.security.provider.ConfigFile;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,9 +48,13 @@ public class MessageProviderServiceTest {
         List<Integer> winLines = new ArrayList<>();
 
         Message messageStart = messageProviderService.startGame(winLines, activeReels, "testId");
-        int rno = messageStart.getRno();
-        String authorizationToken = messageStart.getAuthorizationToken();
-        String gameId = messageStart.getGameId();
+
+
+        SpinParams spinParams = new SpinParams();
+        spinParams.setAuthorizationToken(messageStart.getAuthorizationToken());
+        spinParams.setGameId("testId");
+        spinParams.setRno("50");
+        spinParams.setBet("50");
 
         Message messageSpin;
         List<List<Integer>> symbols;
@@ -59,10 +65,10 @@ public class MessageProviderServiceTest {
         List<Integer> list3;
         List<List<Integer>> newSymbols;
 
-        rno = rno + 1;
-        messageSpin = messageProviderService.executeSpin(rno, 50, authorizationToken, gameId);
+        spinParams.setRno("51");
+        messageSpin = messageProviderService.executeSpin(spinParams);
         symbols = messageSpin.getSymbols();
-        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, rno);
+        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, Integer.parseInt(spinParams.getRno()));
         assertEquals(symbols, checkResultService.getFirst3Symbols(reelPositionInCache));
 
         list1 = gameConfig.getReels().get(0);
@@ -70,16 +76,16 @@ public class MessageProviderServiceTest {
         list3 = gameConfig.getReels().get(2);
 
         newSymbols = new ArrayList<>();
-        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * rno)));
+        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * Integer.parseInt(spinParams.getRno()))));
 
         assertEquals(symbols, checkResultService.getFirst3Symbols(newSymbols));
 
-        rno = rno + 1;
-        messageSpin = messageProviderService.executeSpin(rno, 50, authorizationToken, gameId);
+        spinParams.setRno("52");
+        messageSpin = messageProviderService.executeSpin(spinParams);
         symbols = messageSpin.getSymbols();
-        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, rno);
+        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, Integer.parseInt(spinParams.getRno()));
         assertEquals(symbols, checkResultService.getFirst3Symbols(reelPositionInCache));
 
         list1 = gameConfig.getReels().get(0);
@@ -87,16 +93,16 @@ public class MessageProviderServiceTest {
         list3 = gameConfig.getReels().get(2);
 
         newSymbols = new ArrayList<>();
-        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * rno)));
+        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * Integer.parseInt(spinParams.getRno()))));
 
         assertEquals(symbols, checkResultService.getFirst3Symbols(newSymbols));
 
-        rno = rno + 1;
-        messageSpin = messageProviderService.executeSpin(rno, 50, authorizationToken, gameId);
+        spinParams.setRno("52");
+        messageSpin = messageProviderService.executeSpin(spinParams);
         symbols = messageSpin.getSymbols();
-        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, rno);
+        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, Integer.parseInt(spinParams.getRno()));
         assertEquals(symbols, checkResultService.getFirst3Symbols(reelPositionInCache));
 
         list1 = gameConfig.getReels().get(0);
@@ -104,16 +110,16 @@ public class MessageProviderServiceTest {
         list3 = gameConfig.getReels().get(2);
 
         newSymbols = new ArrayList<>();
-        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * rno)));
+        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * Integer.parseInt(spinParams.getRno()))));
 
         assertEquals(symbols, checkResultService.getFirst3Symbols(newSymbols));
 
-        rno = rno + 1;
-        messageSpin = messageProviderService.executeSpin(rno, 50, authorizationToken, gameId);
+        spinParams.setRno("53");
+        messageSpin = messageProviderService.executeSpin(spinParams);
         symbols = messageSpin.getSymbols();
-        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, rno);
+        reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, Integer.parseInt(spinParams.getRno()));
         assertEquals(symbols, checkResultService.getFirst3Symbols(reelPositionInCache));
 
         list1 = gameConfig.getReels().get(0);
@@ -121,9 +127,9 @@ public class MessageProviderServiceTest {
         list3 = gameConfig.getReels().get(2);
 
         newSymbols = new ArrayList<>();
-        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * rno)));
-        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * rno)));
+        newSymbols.add(rnoInformationService.getMovedList(list1, (gameConfig.getSpin().get(0) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list2, (gameConfig.getSpin().get(1) * Integer.parseInt(spinParams.getRno()))));
+        newSymbols.add(rnoInformationService.getMovedList(list3, (gameConfig.getSpin().get(2) * Integer.parseInt(spinParams.getRno()))));
 
         assertEquals(symbols, checkResultService.getFirst3Symbols(newSymbols));
 

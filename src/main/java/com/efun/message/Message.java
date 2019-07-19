@@ -2,6 +2,7 @@ package com.efun.message;
 
 import com.efun.constants.Status;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public abstract class Message {
@@ -13,7 +14,8 @@ public abstract class Message {
     private String message;
     private WinLineData winlineData;
     private List<List<Integer>> symbols;
-    private double win;
+    private BigDecimal win;
+    private BigDecimal balance;
 
     public Status getStatus() {
         return status;
@@ -71,12 +73,20 @@ public abstract class Message {
         this.symbols = symbols;
     }
 
-    public double getWin() {
+    public BigDecimal getWin() {
         return win;
     }
 
-    public void setWin(double win) {
+    public void setWin(BigDecimal win) {
         this.win = win;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     @Override
@@ -90,6 +100,7 @@ public abstract class Message {
                 ", winlineData=" + winlineData +
                 ", symbols=" + symbols +
                 ", win=" + win +
+                ", balance=" + balance +
                 '}';
     }
 }

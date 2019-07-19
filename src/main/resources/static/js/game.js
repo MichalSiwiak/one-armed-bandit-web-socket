@@ -97,6 +97,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
         $("#symbols").text(JSON.stringify(message.symbols));
         $("#win").text(message.win);
         $("#rno").text(message.rno);
+        $("#balance").text(message.balance);
 
         $("#connect").val();
         if (message.status == 'TERMINATED') {

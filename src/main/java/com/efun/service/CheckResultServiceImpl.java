@@ -7,10 +7,7 @@ import com.efun.web.GameController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -66,7 +63,6 @@ public class CheckResultServiceImpl implements CheckResultService {
                 List<Integer> movedList = rnoInformationService
                         .getMovedList(gameConfig.getReels().get(activeReel), positions);
                 reelPositionNew.setReelNumbers(movedList);
-
                 cacheService.save(reelPositionNew);
 
                 symbols.add(reelPositionNew.getReelNumbers());

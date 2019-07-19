@@ -3,6 +3,7 @@ package com.efun.service;
 import com.efun.config.GameConfig;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,8 @@ public class WinCheckerServiceImpl implements WinCheckerService {
 
 
     private GameConfig gameConfig;
-    private double winInSpin;
+    private BigDecimal winInSpin;
+    private List<Integer> winsArray = new ArrayList<>();
 
     public WinCheckerServiceImpl(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
@@ -24,7 +26,7 @@ public class WinCheckerServiceImpl implements WinCheckerService {
     public boolean isWin(List<List<Integer>> reels, List<List<Integer>> wins) {
 
         boolean win = false;
-        List<Integer> winsArray = new ArrayList<>();
+        winsArray.clear();
 
         Map<Integer, List<Integer>> positionsOfWins = getPositionsOfWins(wins);
         for (Integer integer : positionsOfWins.keySet()) {
@@ -49,14 +51,21 @@ public class WinCheckerServiceImpl implements WinCheckerService {
     }
 
     @Override
-    public double getWinInSpin() {
+    public List<Integer> getWinArray() {
+        return winsArray;
+    }
+
+    @Override
+    public BigDecimal getWinInSpin() {
         return winInSpin;
     }
 
-    private double calculateSumOfWins(List<Integer> winsArray) {
-        double sum = 0;
+
+    private BigDecimal calculateSumOfWins(List<Integer> winsArray) {
+        BigDecimal sum = new BigDecimal("0");
         for (Integer integer : winsArray) {
-            sum = sum + gameConfig.getWinnings().get(integer);
+            //sum = sum + gameConfig.getWinnings().get(integer);
+            sum = sum.add(new BigDecimal(String.valueOf(gameConfig.getWinnings().get(integer))));
         }
 
         winInSpin = sum;
@@ -88,6 +97,13 @@ public class WinCheckerServiceImpl implements WinCheckerService {
         return positions;
     }
 
+    /**
+     * Method checking equality of different elements using XOR logical operator
+     *
+     * @param int[] numbers - list of numbers to check its equality
+     * @return true when all elements equal and false when not
+     * @author Michał Siwiak
+     */
     private boolean compareEqualityOfNumbers(List<Integer> numbers) {
         for (int i = 0; i < numbers.size() - 1; i++) {
             int check = (numbers.get(0) ^ numbers.get(i + 1));

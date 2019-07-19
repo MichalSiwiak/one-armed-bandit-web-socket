@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -128,10 +129,7 @@ public class GameController {
         LOGGER.info("Spin params " + spinParams.toString());
 
         if (validationService.validateSpin(spinParams)) {
-            Message message = messageProviderService.executeSpin(Integer.parseInt(spinParams.getRno()),
-                    Integer.parseInt(spinParams.getBet()),
-                    spinParams.getAuthorizationToken(),
-                    spinParams.getGameId());
+            Message message = messageProviderService.executeSpin(spinParams);
 
             LOGGER.info("Message sent to client [Spin]");
 
@@ -149,16 +147,16 @@ public class GameController {
                 gameResult.setNumberOfSpins(spinList.size());
             }
 
-            List<Double> winList = gameResult.getWinList();
+            List<BigDecimal> winList = gameResult.getWinList();
             if (winList != null) {
                 winList.add(message.getWin());
                 gameResult.setWinList(winList);
-                gameResult.setSumOfWins(gameResult.getSumOfWins() + message.getWin());
+                gameResult.setSumOfWins(gameResult.getSumOfWins().add(message.getWin()));
             } else {
                 winList = new ArrayList<>();
                 winList.add(message.getWin());
                 gameResult.setWinList(winList);
-                gameResult.setSumOfWins(gameResult.getSumOfWins() + message.getWin());
+                gameResult.setSumOfWins(message.getWin());
             }
 
             gameResult.setStatus(Status.ACTIVE.toString());

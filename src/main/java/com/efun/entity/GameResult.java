@@ -4,6 +4,7 @@ import com.efun.message.WinLineData;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class GameResult {
     //in spin
     private List<Integer> spinList;
     private int numberOfSpins;
-    private List<Double> winList;
-    private double sumOfWins;
+    private List<BigDecimal> winList;
+    private BigDecimal sumOfWins;
     //in start
     private Date startDate;
     private Date lastSpinDate;
@@ -83,19 +84,19 @@ public class GameResult {
         this.numberOfSpins = numberOfSpins;
     }
 
-    public List<Double> getWinList() {
+    public List<BigDecimal> getWinList() {
         return winList;
     }
 
-    public void setWinList(List<Double> winList) {
+    public void setWinList(List<BigDecimal> winList) {
         this.winList = winList;
     }
 
-    public double getSumOfWins() {
+    public BigDecimal getSumOfWins() {
         return sumOfWins;
     }
 
-    public void setSumOfWins(double sumOfWins) {
+    public void setSumOfWins(BigDecimal sumOfWins) {
         this.sumOfWins = sumOfWins;
     }
 
