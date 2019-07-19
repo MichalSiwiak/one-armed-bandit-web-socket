@@ -1,14 +1,12 @@
 package com.efun.web;
 
 import com.efun.constants.Status;
-import com.efun.entity.GameDto;
+import com.efun.entity.GameResult;
 import com.efun.message.*;
-import com.efun.service.GameDtoService;
+import com.efun.service.GameResultService;
 import com.efun.service.MessageProviderService;
 import com.efun.validation.ValidationService;
-import com.efun.validation.ValidationServiceImpl;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,17 +27,17 @@ public class GameController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
     private MessageProviderService messageProviderService;
-    private GameDtoService gameDtoService;
+    private GameResultService gameResultService;
     private ValidationService validationService;
     private MessageFactory messageFactory;
 
     public GameController(MessageProviderService messageProviderService,
-                          GameDtoService gameDtoService,
+                          GameResultService gameResultService,
                           ValidationService validationService,
                           MessageFactory messageFactory) {
 
         this.messageProviderService = messageProviderService;
-        this.gameDtoService = gameDtoService;
+        this.gameResultService = gameResultService;
         this.validationService = validationService;
         this.messageFactory = messageFactory;
     }
@@ -68,17 +66,17 @@ public class GameController {
     }
 
     @RequestMapping(value = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public ResponseEntity<List<GameDto>> getAllGames() {
-        List<GameDto> gameDtoList = gameDtoService.findAll();
+    public ResponseEntity<List<GameResult>> getAllGames() {
+        List<GameResult> gameDtoList = gameResultService.findAll();
         return new ResponseEntity<>(gameDtoList, HttpStatus.OK);
     }
 
 
     @MessageMapping("/results")
     @SendTo("/game/results-game")
-    public GameDto updateGame(Map<String, String> tokens) throws Exception {
+    public GameResult updateGame(Map<String, String> tokens) throws Exception {
         String gameId = tokens.get("gameId");
-        GameDto gameDto = gameDtoService.getOne(gameId);
+        GameResult gameDto = gameResultService.getOne(gameId);
         return gameDto;
     }
 
@@ -100,7 +98,7 @@ public class GameController {
 
         if (message.getStatus().equals(Status.NEW)) {
 
-            GameDto gameDto = new GameDto();
+            GameResult gameDto = new GameResult();
             gameDto.setGameId(gameId);
             gameDto.setAuthorizationToken(message.getAuthorizationToken());
             gameDto.setWinlineData(message.getWinlineData());
@@ -108,7 +106,7 @@ public class GameController {
             gameDto.setStatus(Status.NEW.toString());
 
             LOGGER.info("Saving changes to mongo database ...");
-            gameDtoService.save(gameDto);
+            gameResultService.save(gameDto);
             LOGGER.info("Inserted new record");
         } else {
             LOGGER.info("Status invalid - no records inserted");
@@ -137,52 +135,42 @@ public class GameController {
 
             LOGGER.info("Message sent to client [Spin]");
 
-            GameDto gameDto = gameDtoService.getOne(gameId);
-            List<Integer> spinList = gameDto.getSpinList();
+            GameResult gameResult = gameResultService.getOne(gameId);
+            List<Integer> spinList = gameResult.getSpinList();
 
             if (spinList != null) {
                 spinList.add(message.getRno());
-                gameDto.setSpinList(spinList);
-                gameDto.setNumberOfSpins(spinList.size());
+                gameResult.setSpinList(spinList);
+                gameResult.setNumberOfSpins(spinList.size());
             } else {
                 spinList = new ArrayList<>();
                 spinList.add(message.getRno());
-                gameDto.setSpinList(spinList);
-                gameDto.setNumberOfSpins(spinList.size());
+                gameResult.setSpinList(spinList);
+                gameResult.setNumberOfSpins(spinList.size());
             }
 
-            List<Double> winList = gameDto.getWinList();
+            List<Double> winList = gameResult.getWinList();
             if (winList != null) {
                 winList.add(message.getWin());
-                gameDto.setWinList(winList);
-                gameDto.setSumOfWins(gameDto.getSumOfWins() + message.getWin());
+                gameResult.setWinList(winList);
+                gameResult.setSumOfWins(gameResult.getSumOfWins() + message.getWin());
             } else {
                 winList = new ArrayList<>();
                 winList.add(message.getWin());
-                gameDto.setWinList(winList);
-                gameDto.setSumOfWins(gameDto.getSumOfWins() + message.getWin());
+                gameResult.setWinList(winList);
+                gameResult.setSumOfWins(gameResult.getSumOfWins() + message.getWin());
             }
-            //cannot codec enums :(
-            gameDto.setStatus(Status.ACTIVE.toString());
-            gameDto.setLastSpinDate(new Date());
 
-            Document document = new Document();
-            document.put("spinList", gameDto.getSpinList());
-            document.put("numberOfSpins", gameDto.getNumberOfSpins());
-            document.put("winList", gameDto.getWinList());
-            document.put("sumOfWins", gameDto.getSumOfWins());
-            document.put("status", gameDto.getStatus());
-            document.put("lastSpinDate", gameDto.getLastSpinDate());
+            gameResult.setStatus(Status.ACTIVE.toString());
+            gameResult.setLastSpinDate(new Date());
 
             LOGGER.info("Saving changes to mongo database ...");
-            gameDtoService.updateOne(gameId, document);
+            gameResultService.save(gameResult);
             LOGGER.info("Changes saved of spin");
             return message;
         } else {
             return messageFactory.createMessage(Status.INCORRECT_DATA);
         }
-
-
     }
 
     /**
@@ -200,16 +188,12 @@ public class GameController {
         Message message = messageProviderService.endGame(endParams.getAuthorizationToken(), endParams.getGameId());
         LOGGER.info("Message sent to client [END]");
 
-        GameDto gameDto = gameDtoService.getOne(gameId);
-        gameDto.setStatus(Status.TERMINATED.toString());
-        gameDto.setEndDate(new Date());
-
-        Document document = new Document();
-        document.put("status", gameDto.getStatus());
-        document.put("endDate", gameDto.getEndDate());
+        GameResult gameResult = gameResultService.getOne(gameId);
+        gameResult.setStatus(Status.TERMINATED.toString());
+        gameResult.setEndDate(new Date());
 
         LOGGER.info("Saving changes to mongo database ...");
-        gameDtoService.updateOne(gameId, document);
+        gameResultService.save(gameResult);
         LOGGER.info("Changes saved of end game");
 
         return message;

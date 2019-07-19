@@ -1,15 +1,18 @@
-#db connection data sources
-connection_string_localhost: mongodb://localhost:27017/test
-
 #the upper range of RNO
 max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 5
 #collection name os saved gamed ended and pending
-database_name: local
-collection_results_of_games: results
+
 server:
   port: 8090
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
 ---
 
 # game config

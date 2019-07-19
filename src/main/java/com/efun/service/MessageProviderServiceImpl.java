@@ -2,7 +2,6 @@ package com.efun.service;
 
 import com.efun.config.GameConfig;
 import com.efun.constants.Status;
-import com.efun.entity.RandomNumberResult;
 import com.efun.message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

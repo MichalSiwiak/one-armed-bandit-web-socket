@@ -2,6 +2,8 @@ package com.efun.entity;
 
 import com.efun.message.WinLineData;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+
 import java.util.Date;
 import java.util.List;
 
@@ -13,10 +15,10 @@ import java.util.List;
  * @author Michał Siwiak
  */
 
-public class GameDto {
+public class GameResult {
 
-    //in start
-    private ObjectId id;
+    @Id
+    private String id;
     private String gameId;
     private String authorizationToken;
     private WinLineData winlineData;
@@ -33,29 +35,11 @@ public class GameDto {
     //in all statuses
     private String status;
 
-    @Override
-    public String toString() {
-        return "GameDto{" +
-                "id=" + id +
-                ", gameId='" + gameId + '\'' +
-                ", authorizationToken='" + authorizationToken + '\'' +
-                ", winlineData=" + winlineData +
-                ", spinList=" + spinList +
-                ", numberOfSpins=" + numberOfSpins +
-                ", winList=" + winList +
-                ", sumOfWins=" + sumOfWins +
-                ", startDate=" + startDate +
-                ", lastSpinDate=" + lastSpinDate +
-                ", endDate=" + endDate +
-                ", status=" + status +
-                '}';
-    }
-
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -145,5 +129,23 @@ public class GameDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "GameResult{" +
+                "id='" + id + '\'' +
+                ", gameId='" + gameId + '\'' +
+                ", authorizationToken='" + authorizationToken + '\'' +
+                ", winlineData=" + winlineData +
+                ", spinList=" + spinList +
+                ", numberOfSpins=" + numberOfSpins +
+                ", winList=" + winList +
+                ", sumOfWins=" + sumOfWins +
+                ", startDate=" + startDate +
+                ", lastSpinDate=" + lastSpinDate +
+                ", endDate=" + endDate +
+                ", status='" + status + '\'' +
+                '}';
     }
 }
