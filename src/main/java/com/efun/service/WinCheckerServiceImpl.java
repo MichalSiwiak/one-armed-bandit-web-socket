@@ -13,44 +13,63 @@ public class WinCheckerServiceImpl implements WinCheckerService {
 
 
     private GameConfig gameConfig;
+    private double winInSpin;
 
     public WinCheckerServiceImpl(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
     }
 
+
     @Override
-    public boolean isWin(List<List<Integer>> symbols, List<List<Integer>> win) {
+    public boolean isWin(List<List<Integer>> reels, List<List<Integer>> wins) {
 
-        win= gameConfig.getWins();
-        List<List<Integer>> winSublist = new ArrayList<>();
-        for (List<Integer> list : symbols) {
-            winSublist.add(list.subList(0, 3));
-        }
+        boolean win = false;
+        List<Integer> winsArray = new ArrayList<>();
 
-        Map<Integer, List<Integer>> positionsOfWins = getPositionsOfWins(win);
-
+        Map<Integer, List<Integer>> positionsOfWins = getPositionsOfWins(wins);
         for (Integer integer : positionsOfWins.keySet()) {
+
             List<Integer> list = positionsOfWins.get(integer);
-
             List<Integer> elementsToCompare = new ArrayList<>();
+
             for (Integer element : list) {
-                elementsToCompare.add(getPositionsOfSymbols().get(element));
+                elementsToCompare.add(getPositionsOfSymbols(reels).get(element));
             }
-            System.out.println("Elements to Compare " + elementsToCompare);
             boolean checkWin = compareEqualityOfNumbers(elementsToCompare);
-            System.out.println(checkWin);
+
+            if (checkWin) {
+                winsArray.add(elementsToCompare.iterator().next());
+            }
+
+            calculateSumOfWins(winsArray);
+            win = win || checkWin;
         }
+        return win;
 
-
-        return false;
     }
 
-    private Map<Integer, List<Integer>> getPositionsOfWins(List<List<Integer>> win) {
+    @Override
+    public double getWinInSpin() {
+        return winInSpin;
+    }
+
+    private double calculateSumOfWins(List<Integer> winsArray) {
+        double sum = 0;
+        for (Integer integer : winsArray) {
+            sum = sum + gameConfig.getWinnings().get(integer);
+        }
+
+        winInSpin = sum;
+        return sum;
+    }
+
+
+    private Map<Integer, List<Integer>> getPositionsOfWins(List<List<Integer>> wins) {
         Map<Integer, List<Integer>> map = new HashMap<>();
-        for (int j = 0; j < win.size(); j++) {
+        for (int j = 0; j < wins.size(); j++) {
             List<Integer> positions = new ArrayList<>();
-            for (int i = 0; i < win.get(j).size(); i++) {
-                if (win.get(j).get(i) == 1)
+            for (int i = 0; i < wins.get(j).size(); i++) {
+                if (wins.get(j).get(i) == 1)
                     positions.add(i);
             }
             map.put(j, positions);
@@ -58,17 +77,18 @@ public class WinCheckerServiceImpl implements WinCheckerService {
         return map;
     }
 
-    private List<Integer> getPositionsOfSymbols(List<List<Integer>> symbols) {
+
+    private List<Integer> getPositionsOfSymbols(List<List<Integer>> reels) {
         List<Integer> positions = new ArrayList<>();
-        for (int j = 0; j < symbols.size(); j++) {
-            for (int i = 0; i < symbols.get(j).size(); i++) {
-                positions.add(symbols.get(j).get(i));
+        for (int j = 0; j < reels.size(); j++) {
+            for (int i = 0; i < 3; i++) {
+                positions.add(reels.get(j).get(i));
             }
         }
         return positions;
     }
 
-    private static boolean compareEqualityOfNumbers(List<Integer> numbers) {
+    private boolean compareEqualityOfNumbers(List<Integer> numbers) {
         for (int i = 0; i < numbers.size() - 1; i++) {
             int check = (numbers.get(0) ^ numbers.get(i + 1));
             if (check != 0) {
@@ -78,3 +98,5 @@ public class WinCheckerServiceImpl implements WinCheckerService {
         return true;
     }
 }
+
+

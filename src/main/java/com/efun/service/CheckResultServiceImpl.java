@@ -72,7 +72,14 @@ public class CheckResultServiceImpl implements CheckResultService {
                 symbols.add(reelPositionNew.getReelNumbers());
             }
         }
-        return symbols;
+
+
+        List<List<Integer>> result = new ArrayList<>();
+        for (List<Integer> symbol : symbols) {
+            result.add(symbol.subList(0,3));
+        }
+
+        return result;
     }
 
     @PostConstruct

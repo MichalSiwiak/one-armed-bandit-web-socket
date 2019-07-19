@@ -1,8 +1,6 @@
 package com.efun;
 
 import com.efun.config.GameConfig;
-import com.efun.entity.RandomNumberResult;
-import com.efun.service.GameCacheService;
 import com.efun.service.MessageProviderService;
 import com.efun.service.MessageProviderServiceImpl;
 import com.efun.service.TokenServiceHandler;
@@ -14,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.apache.commons.codec.digest.DigestUtils;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,8 +28,8 @@ public class OneArmedBanditSpringBootApplicationTests {
     @Autowired
     private TokenServiceHandler tokenServiceHandler;
 
-    @Autowired
-    private GameCacheService gameCacheService;
+    /*@Autowired
+    private GameCacheService gameCacheService;*/
 
     @Value("${max_game_number}")
     private int maxGameNumber;
