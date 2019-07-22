@@ -1,5 +1,6 @@
 package com.efun.message;
 
+import com.efun.components.WinLineData;
 import com.efun.constants.Status;
 
 import java.math.BigDecimal;
@@ -12,10 +13,31 @@ public abstract class Message {
     private String authorizationToken;
     private int rno;
     private String message;
-    private WinLineData winlineData;
+    private WinLineData winLineData;
     private List<List<Integer>> symbols;
-    private BigDecimal win;
+    private BigDecimal winValue;
     private BigDecimal balance;
+    private List<Integer> activeWinLines;
+    private List<Integer> activeReels;
+    private boolean win;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "status=" + status +
+                ", gameId='" + gameId + '\'' +
+                ", authorizationToken='" + authorizationToken + '\'' +
+                ", rno=" + rno +
+                ", message='" + message + '\'' +
+                ", winLineData=" + winLineData +
+                ", symbols=" + symbols +
+                ", winValue=" + winValue +
+                ", balance=" + balance +
+                ", activeWinLines=" + activeWinLines +
+                ", activeReels=" + activeReels +
+                ", win=" + win +
+                '}';
+    }
 
     public Status getStatus() {
         return status;
@@ -57,12 +79,12 @@ public abstract class Message {
         this.message = message;
     }
 
-    public WinLineData getWinlineData() {
-        return winlineData;
+    public WinLineData getWinLineData() {
+        return winLineData;
     }
 
-    public void setWinlineData(WinLineData winlineData) {
-        this.winlineData = winlineData;
+    public void setWinLineData(WinLineData winLineData) {
+        this.winLineData = winLineData;
     }
 
     public List<List<Integer>> getSymbols() {
@@ -73,12 +95,12 @@ public abstract class Message {
         this.symbols = symbols;
     }
 
-    public BigDecimal getWin() {
-        return win;
+    public BigDecimal getWinValue() {
+        return winValue;
     }
 
-    public void setWin(BigDecimal win) {
-        this.win = win;
+    public void setWinValue(BigDecimal winValue) {
+        this.winValue = winValue;
     }
 
     public BigDecimal getBalance() {
@@ -89,19 +111,28 @@ public abstract class Message {
         this.balance = balance;
     }
 
-    @Override
-    public String toString() {
-        return "Message{" +
-                "status=" + status +
-                ", gameId='" + gameId + '\'' +
-                ", authorizationToken='" + authorizationToken + '\'' +
-                ", rno=" + rno +
-                ", message='" + message + '\'' +
-                ", winlineData=" + winlineData +
-                ", symbols=" + symbols +
-                ", win=" + win +
-                ", balance=" + balance +
-                '}';
+    public List<Integer> getActiveWinLines() {
+        return activeWinLines;
+    }
+
+    public void setActiveWinLines(List<Integer> activeWinLines) {
+        this.activeWinLines = activeWinLines;
+    }
+
+    public List<Integer> getActiveReels() {
+        return activeReels;
+    }
+
+    public void setActiveReels(List<Integer> activeReels) {
+        this.activeReels = activeReels;
+    }
+
+    public boolean isWin() {
+        return win;
+    }
+
+    public void setWin(boolean win) {
+        this.win = win;
     }
 }
 

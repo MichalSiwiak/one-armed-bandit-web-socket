@@ -1,7 +1,6 @@
 package com.efun.entity;
 
-import com.efun.message.WinLineData;
-import org.bson.types.ObjectId;
+import com.efun.components.WinLineData;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;

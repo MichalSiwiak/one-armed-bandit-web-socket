@@ -93,9 +93,10 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
         $("#token").text(token);
         $("#status").text(message.status);
         $("#message").text(message.message);
-        $("#winLines").text(JSON.stringify(message.winlineData));
+        $("#winLines").text(JSON.stringify(message.winLineData));
         $("#symbols").text(JSON.stringify(message.symbols));
         $("#win").text(message.win);
+        $("#winValue").text(message.winValue);
         $("#rno").text(message.rno);
         $("#balance").text(message.balance);
 

@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * Class represents configuration file
- * @author Michał Siwiak
  *
+ * @author Michał Siwiak
  */
 @Component
 @ConfigurationProperties("game-config")
@@ -18,7 +18,21 @@ public class GameConfig {
     private List<List<Integer>> reels = new ArrayList<>();
     private List<Integer> spin = new ArrayList<>();
     private List<Double> winnings = new ArrayList<>();
-    private List<List<Integer>> wins = new ArrayList<>();
+    private List<WinLine> winLines = new ArrayList<>();
+    private boolean wineLineOnlyOnAllActiveReels;
+    private boolean filterOnlyHighestResultsInWinLine;
+
+    @Override
+    public String toString() {
+        return "GameConfig{" +
+                "reels=" + reels +
+                ", spin=" + spin +
+                ", winnings=" + winnings +
+                ", winLines=" + winLines +
+                ", wineLineOnlyOnAllActiveReels=" + wineLineOnlyOnAllActiveReels +
+                ", filterOnlyHighestResultsInWinLine=" + filterOnlyHighestResultsInWinLine +
+                '}';
+    }
 
     public List<List<Integer>> getReels() {
         return reels;
@@ -44,11 +58,27 @@ public class GameConfig {
         this.winnings = winnings;
     }
 
-    public List<List<Integer>> getWins() {
-        return wins;
+    public List<WinLine> getWinLines() {
+        return winLines;
     }
 
-    public void setWins(List<List<Integer>> wins) {
-        this.wins = wins;
+    public void setWinLines(List<WinLine> winLines) {
+        this.winLines = winLines;
+    }
+
+    public boolean isWineLineOnlyOnAllActiveReels() {
+        return wineLineOnlyOnAllActiveReels;
+    }
+
+    public void setWineLineOnlyOnAllActiveReels(boolean wineLineOnlyOnAllActiveReels) {
+        this.wineLineOnlyOnAllActiveReels = wineLineOnlyOnAllActiveReels;
+    }
+
+    public boolean isFilterOnlyHighestResultsInWinLine() {
+        return filterOnlyHighestResultsInWinLine;
+    }
+
+    public void setFilterOnlyHighestResultsInWinLine(boolean filterOnlyHighestResultsInWinLine) {
+        this.filterOnlyHighestResultsInWinLine = filterOnlyHighestResultsInWinLine;
     }
 }

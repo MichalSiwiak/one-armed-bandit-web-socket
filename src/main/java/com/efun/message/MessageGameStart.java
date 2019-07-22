@@ -14,8 +14,10 @@ public class MessageGameStart extends Message {
         setGameId(super.getGameId());
         setAuthorizationToken(super.getAuthorizationToken());
         setRno(super.getRno());
-        setWinlineData(super.getWinlineData());
+        setWinLineData(super.getWinLineData());
         setMessage(super.getMessage());
         setBalance(super.getBalance());
+        setActiveReels(super.getActiveReels());
+        setActiveWinLines(super.getActiveWinLines());
     }
 }

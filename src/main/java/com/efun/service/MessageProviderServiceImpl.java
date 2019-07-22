@@ -1,6 +1,7 @@
 package com.efun.service;
 
-import com.efun.components.Pocket;
+import com.efun.components.TotalWinInSpin;
+import com.efun.components.WinLineData;
 import com.efun.config.GameConfig;
 import com.efun.constants.Status;
 import com.efun.message.*;
@@ -29,30 +30,22 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private TokenServiceHandler tokenServiceHandler;
     private CheckResultService checkResultService;
     private WinCheckerService winCheckerService;
-    private Pocket pocket;
 
-
-    private List<Integer> winLines = new ArrayList<>();
-    private List<Integer> activeReels = new ArrayList<>();
 
     public MessageProviderServiceImpl(MessageFactory messageFactory,
                                       GameConfig gameConfig,
                                       TokenServiceHandler tokenServiceHandler,
                                       CheckResultService checkResultService,
-                                      WinCheckerService winCheckerService,
-                                      Pocket pocket) {
+                                      WinCheckerService winCheckerService) {
 
         this.messageFactory = messageFactory;
         this.gameConfig = gameConfig;
         this.tokenServiceHandler = tokenServiceHandler;
         this.checkResultService = checkResultService;
         this.winCheckerService = winCheckerService;
-        this.pocket = pocket;
     }
 
     private Map<String, Message> sessions = new ConcurrentHashMap<>();
-    //temporary collection for testing only
-    //private Map<String, String> tokens = new ConcurrentHashMap<>();
 
     /**
      * Method creating message when game is started
@@ -70,10 +63,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * @author Michał Siwiak
      */
     @Override
-    public Message startGame(List<Integer> winLines, List<Integer> activeReels, String gameId) {
-
-        this.winLines = winLines;
-        this.activeReels = activeReels;
+    public Message startGame(List<Integer> activeWinLines, List<Integer> activeReels, String gameId) {
 
         if (sessions.size() > maxGameNumber - 1) {
 
@@ -89,51 +79,22 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             message.setAuthorizationToken(token);
             message.setGameId(gameId);
             LOGGER.info("Generated authorization=" + token);
-            //for testing only
-            //tokens.put(gameId, token);
 
             int randomRno = getRandomNumberInRange(1, maxRno);
             message.setRno(randomRno);
             LOGGER.info("The random RNO is=" + randomRno);
 
-            //get only wins elements
-          /*  List<RandomNumberResult> wins = gameCacheService.findWins(token);
-            double quantity = roundDouble2precision((double) wins.size() / (double) maxRno, 4);
-            WinLineData winlineData = new WinLineData();
-            winlineData.setQuantity(quantity);
-            List<WinLine> winLinesInResponse = new ArrayList<>();
-            Map<Integer, List<Integer>> positionsMap = new HashMap<>();
-
-            for (RandomNumberResult win : wins) {
-                //if win it's enough to choose the first index
-                Integer index = win.getReelsInRandomNumber().get(0).get(1);
-                if (!positionsMap.containsKey(index)) {
-                    List<Integer> positions = new ArrayList<>();
-                    positions.add(win.getRandomNumber());
-                    positionsMap.put(index, positions);
-                } else {
-                    List<Integer> positions = positionsMap.get(index);
-                    positions.add(win.getRandomNumber());
-                }
-            }
-            for (Integer index : positionsMap.keySet()) {
-                WinLine winLine = new WinLine();
-                winLine.setIndex(index);
-                winLine.setMultiply(gameConfig.getWinnings().get(index));
-                winLine.setPositions(positionsMap.get(index));
-                winLinesInResponse.add(winLine);
-            }
-            winlineData.setWinLines(winLinesInResponse);*/
-
-            //message.setWinlineData(winlineData);
-            message.setBalance(pocket.getBalance());
+            WinLineData winLineData = new WinLineData(winCheckerService.getWinLinesData(activeWinLines, activeReels));
+            message.setWinLineData(winLineData);
+            message.setActiveWinLines(activeWinLines);
+            message.setActiveReels(activeReels);
+            message.setBalance(new BigDecimal("5000"));
             message.setMessage(message.getStatus().getMessageBody());
             LOGGER.info("Game configured successfully");
             LOGGER.info("Full response: " + message);
             sessions.put(token, message);
-
             return message;
-/*
+            /*
             if (wins.size() != 0) {
                //To Implement
             } else {
@@ -144,7 +105,6 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 return messageError;
 
             }*/
-
         }
     }
 
@@ -170,31 +130,35 @@ public class MessageProviderServiceImpl implements MessageProviderService {
             Message messageStarted = sessions.get(spinParams.getAuthorizationToken());
             Message messageSpin = messageFactory.createMessage(Status.ACTIVE);
             messageSpin.setGameId(messageStarted.getGameId());
-            messageSpin.setWinlineData(messageStarted.getWinlineData());
+            messageSpin.setWinLineData(messageStarted.getWinLineData());
 
-            //change it in future
             messageSpin.setRno(Integer.parseInt(spinParams.getRno()));
             LOGGER.info("Spin was started ... ");
             LOGGER.info("Getting RandomNumberResult from database RNO=" + Integer.parseInt(spinParams.getRno()));
 
-            List<List<Integer>> reelPositionInCache =
-                    checkResultService.isReelPositionInCache(activeReels, Integer.parseInt(spinParams.getRno()));
+            List<Integer> activeReels = messageStarted.getActiveReels();
+            List<Integer> activeWinLines = messageStarted.getActiveWinLines();
 
-            pocket.setBalance(pocket.getBalance().subtract(new BigDecimal(spinParams.getBet())));
-            messageSpin.setBalance(pocket.getBalance());
-            messageSpin.setSymbols(checkResultService.getFirst3Symbols(reelPositionInCache));
+            List<List<Integer>> symbols =
+                    checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, Integer.parseInt(spinParams.getRno()));
 
-            boolean win = winCheckerService.isWin(reelPositionInCache, gameConfig.getWins());
+            messageStarted.setBalance(messageStarted.getBalance().subtract(new BigDecimal(spinParams.getBet())));
+            symbols = checkResultService.getFirst3Symbols(symbols);
+            messageSpin.setSymbols(symbols);
 
-            BigDecimal winInSpin = winCheckerService.getWinInSpin();
-            BigDecimal valueInSpin = winInSpin.multiply(new BigDecimal(spinParams.getBet()));
-            pocket.setBalance(pocket.getBalance().add(valueInSpin));
+            boolean isWin = winCheckerService.isWin(symbols, activeReels, activeWinLines);
+            messageSpin.setWin(isWin);
 
-            messageSpin.setBalance(pocket.getBalance());
-            messageSpin.setWin(valueInSpin);
+            TotalWinInSpin wins = winCheckerService.getWins(symbols, activeReels, activeWinLines);
+            BigDecimal valueInSpinWithBet = wins.getTotalMultiply().multiply(new BigDecimal(spinParams.getBet()));
+
+            messageStarted.setBalance(messageStarted.getBalance().add(valueInSpinWithBet));
+            messageSpin.setBalance(messageStarted.getBalance());
+
+            messageSpin.setWinValue(valueInSpinWithBet);
             messageSpin.setMessage(messageSpin.getStatus().getMessageBody());
 
-            LOGGER.info("Spin executed successfully RNO=" + spinParams.getRno() + " Win=" + winInSpin);
+            LOGGER.info("Spin executed successfully RNO=" + spinParams.getRno() + " Win=" + valueInSpinWithBet);
             LOGGER.info("Full response: " + messageSpin);
 
             return messageSpin;
@@ -244,25 +208,11 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         }
     }
 
-    /*public Map<String, String> getTokens() {
-        return tokens;
-    }
-    */
-
     public static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("Max must be greater than min");
         }
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
-    }
-
-    public double roundDouble2precision(double value, int places) {
-        if (places < 0)
-            throw new IllegalArgumentException();
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
     }
 }

@@ -99,15 +99,15 @@ public class GameController {
 
         if (message.getStatus().equals(Status.NEW)) {
 
-            GameResult gameDto = new GameResult();
-            gameDto.setGameId(gameId);
-            gameDto.setAuthorizationToken(message.getAuthorizationToken());
-            gameDto.setWinlineData(message.getWinlineData());
-            gameDto.setStartDate(new Date());
-            gameDto.setStatus(Status.NEW.toString());
+            GameResult gameResult = new GameResult();
+            gameResult.setGameId(gameId);
+            gameResult.setAuthorizationToken(message.getAuthorizationToken());
+            gameResult.setWinlineData(message.getWinLineData());
+            gameResult.setStartDate(new Date());
+            gameResult.setStatus(Status.NEW.toString());
 
             LOGGER.info("Saving changes to mongo database ...");
-            gameResultService.save(gameDto);
+            gameResultService.save(gameResult);
             LOGGER.info("Inserted new record");
         } else {
             LOGGER.info("Status invalid - no records inserted");
@@ -149,14 +149,14 @@ public class GameController {
 
             List<BigDecimal> winList = gameResult.getWinList();
             if (winList != null) {
-                winList.add(message.getWin());
+                winList.add(message.getWinValue());
                 gameResult.setWinList(winList);
-                gameResult.setSumOfWins(gameResult.getSumOfWins().add(message.getWin()));
+                gameResult.setSumOfWins(gameResult.getSumOfWins().add(message.getWinValue()));
             } else {
                 winList = new ArrayList<>();
-                winList.add(message.getWin());
+                winList.add(message.getWinValue());
                 gameResult.setWinList(winList);
-                gameResult.setSumOfWins(message.getWin());
+                gameResult.setSumOfWins(message.getWinValue());
             }
 
             gameResult.setStatus(Status.ACTIVE.toString());
@@ -175,7 +175,7 @@ public class GameController {
      * Method mapping request and responses of web socket when game is closing
      *
      * @param @DestinationVariable String gameId
-     * @param tokens<String, String> tokens
+     * @param EndParams endParams
      * @return MessageGameEnd endGame
      * @author Michał Siwiak
      */

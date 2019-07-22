@@ -35,7 +35,7 @@ public class CheckResultServiceImpl implements CheckResultService {
 
     // can be not one result !!!!
     @Override
-    public List<List<Integer>> isReelPositionInCache(List<Integer> activeReels, int rno) {
+    public List<List<Integer>> getReelPositionFromCacheOrCalculateAndSave(List<Integer> activeReels, int rno) {
 
         List<List<Integer>> symbols = new ArrayList<>();
 
@@ -55,7 +55,6 @@ public class CheckResultServiceImpl implements CheckResultService {
 
                 symbols.add(reelNumbers);
             } else {
-                //reelsNamesService.getNameOfReel()
                 //LOGGER.info("Position not found");
                 ReelPosition reelPositionNew = new ReelPosition();
                 reelPositionNew.setMd5Hex(nameOfReel);
@@ -80,6 +79,4 @@ public class CheckResultServiceImpl implements CheckResultService {
         }
         return result;
     }
-
-
 }

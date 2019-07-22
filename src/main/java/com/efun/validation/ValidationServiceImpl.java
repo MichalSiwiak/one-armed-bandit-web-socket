@@ -1,6 +1,5 @@
 package com.efun.validation;
 
-import com.efun.message.InitParams;
 import com.efun.message.SpinParams;
 import org.springframework.stereotype.Service;
 

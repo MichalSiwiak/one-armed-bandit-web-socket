@@ -13,9 +13,10 @@ public class MessageGameSpin extends Message {
         setStatus(status);
         setGameId(super.getGameId());
         setRno(super.getRno());
-        setWinlineData(super.getWinlineData());
+        setWinLineData(super.getWinLineData());
         setSymbols(super.getSymbols());
-        setWin(super.getWin());
+        setWinValue(super.getWinValue());
+        setWin(super.isWin());
         setMessage(super.getMessage());
         setBalance(super.getBalance());
     }

@@ -31,14 +31,14 @@ public class CheckResultServiceTest {
         activeReels.add(0);
         activeReels.add(1);
         activeReels.add(2);
-        //activeReels.add(3);
-        //activeReels.add(4);
+        activeReels.add(3);
+        activeReels.add(4);
 
-        int rnoMax = 1000;
+        int rnoMax = 500;
 
         for (int rno = 1; rno <= rnoMax; rno++) {
 
-            List<List<Integer>> reelPositionInCache = checkResultService.isReelPositionInCache(activeReels, rno);
+            List<List<Integer>> reelPositionInCache = checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, rno);
             for (int i = 0; i < reelPositionInCache.size(); i++) {
                 List<Integer> listToCheck = reelPositionInCache.get(i);
 

@@ -1,11 +1,15 @@
 package com.efun.service;
-import java.math.BigDecimal;
+
+import com.efun.components.TotalWinInSpin;
+import com.efun.config.WinLine;
 import java.util.List;
 
 public interface WinCheckerService {
 
-    public boolean isWin(List<List<Integer>> symbols, List<List<Integer>> win);
-    public BigDecimal getWinInSpin();
-    public List<Integer> getWinArray();
 
+    public TotalWinInSpin getWins(List<List<Integer>> symbols, List<Integer> activeReels, List<Integer> activeWinLines);
+
+    public boolean isWin(List<List<Integer>> symbols, List<Integer> activeReels, List<Integer> activeWinLines);
+
+    public List<WinLine> getWinLinesData(List<Integer> activeWinLines, List<Integer> activeReels);
 }
