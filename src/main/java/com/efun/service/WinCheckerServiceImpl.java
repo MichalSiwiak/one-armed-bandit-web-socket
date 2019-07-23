@@ -5,6 +5,7 @@ import com.efun.components.TotalWinInSpin;
 import com.efun.config.GameConfig;
 import com.efun.config.WinLine;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,14 +68,21 @@ public class WinCheckerServiceImpl implements WinCheckerService {
                          List<Integer> activeReels,
                          List<Integer> activeWinLines) {
 
-        TotalWinInSpin wins = getWins(symbols, activeReels, activeWinLines);
+        List<WinLine> winLinesData = getWinLinesData(activeWinLines, activeReels);
+        List<Integer> symbolsToOneArray = createSymbolsToOneArray(symbols);
 
-
-        if (wins.getResultWinList().size() == 0) {
-            return false;
-        } else {
-            return true;
+        for (WinLine winLine : winLinesData) {
+            List<List<Integer>> indexesList = winLine.getPositions();
+            for (List<Integer> indexes : indexesList) {
+                List<Integer> equalValues = collectListFromIndexes(indexes, symbolsToOneArray);
+                boolean checkWin = compareEqualityOfNumbers(winLine.getIndex(), equalValues);
+                if (checkWin) {
+                    return true;
+                }
+            }
         }
+
+        return false;
     }
 
 

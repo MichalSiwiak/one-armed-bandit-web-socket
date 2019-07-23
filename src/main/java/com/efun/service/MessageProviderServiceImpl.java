@@ -32,14 +32,15 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private CheckResultService checkResultService;
     private WinCheckerService winCheckerService;
     private ValidationService validationService;
-
+    private RnoInformationService rnoInformationService;
 
     public MessageProviderServiceImpl(MessageFactory messageFactory,
                                       GameConfig gameConfig,
                                       TokenServiceHandler tokenServiceHandler,
                                       CheckResultService checkResultService,
                                       WinCheckerService winCheckerService,
-                                      ValidationService validationService) {
+                                      ValidationService validationService,
+                                      RnoInformationService rnoInformationService) {
 
         this.messageFactory = messageFactory;
         this.gameConfig = gameConfig;
@@ -47,7 +48,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
         this.checkResultService = checkResultService;
         this.winCheckerService = winCheckerService;
         this.validationService = validationService;
-
+        this.rnoInformationService = rnoInformationService;
     }
 
     private Map<String, Message> sessions = new ConcurrentHashMap<>();
@@ -78,37 +79,54 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 LOGGER.warn("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
                 return messageError;
             } else {
-             /*
-            if (wins.size() != 0) {
-               //To Implement
-            } else {
-                Message messageError = messageFactory.createMessage(Status.CONFIGURATION_NOT_ACCEPTED);
-                messageError.setStatus(Status.CONFIGURATION_NOT_ACCEPTED);
-                messageError.setMessage(messageError.getStatus().getMessageBody());
-                LOGGER.warn("ERROR - No wins calculated for this configuration");
-                return messageError;
-            }*/
-                Message message = messageFactory.createMessage(Status.NEW);
-                String token = tokenServiceHandler.generateToken(gameId, sessions);
+                //should be saved in the database
+                int periodicity = rnoInformationService.
+                        calculateCyclicalPositionOfReels(initParams.getReelsSelected());
+                LOGGER.info("Calculated Periodicity=" + periodicity);
+                boolean ifWinIsEverPossible = true;
 
-                message.setAuthorizationToken(token);
-                message.setGameId(gameId);
-                LOGGER.info("Generated authorization=" + token);
-                int randomRno = getRandomNumberInRange(1, maxRno);
-                message.setRno(randomRno);
-                LOGGER.info("The random RNO is=" + randomRno);
+               /* int countWins = 0;
+                for (int i = 1; i <= periodicity; i++) {
+                    List<List<Integer>> symbols =
+                            checkResultService.getReelPositionFromCacheOrCalculateAndSave(initParams.getReelsSelected(), i);
+                    symbols = checkResultService.getFirst3Symbols(symbols);
+                    boolean winCheck = winCheckerService.isWin(symbols, initParams.getReelsSelected(), initParams.getWinLinesSelected());
+                    if (winCheck) {
+                        countWins++;
+                    }
+                    ifWinIsEverPossible = ifWinIsEverPossible || winCheck;
+                }*/
 
-                WinLineData winLineData = new WinLineData(winCheckerService.
-                        getWinLinesData(initParams.getWinLinesSelected(), initParams.getReelsSelected()));
-                message.setWinLineData(winLineData);
-                message.setActiveWinLines(initParams.getWinLinesSelected());
-                message.setActiveReels(initParams.getReelsSelected());
-                message.setBalance(new BigDecimal("5000"));
-                message.setMessage(message.getStatus().getMessageBody());
-                LOGGER.info("Game configured successfully");
-                LOGGER.info("Full response: " + message);
-                sessions.put(token, message);
-                return message;
+                if (ifWinIsEverPossible) {
+                    //LOGGER.info("Found number ow wins for configured game:" + countWins);
+                    Message message = messageFactory.createMessage(Status.NEW);
+                    String token = tokenServiceHandler.generateToken(gameId, sessions);
+
+                    message.setAuthorizationToken(token);
+                    message.setGameId(gameId);
+                    LOGGER.info("Generated authorization=" + token);
+                    int randomRno = getRandomNumberInRange(1, maxRno);
+                    message.setRno(randomRno);
+                    LOGGER.info("The random RNO is=" + randomRno);
+
+                    WinLineData winLineData = new WinLineData(winCheckerService.
+                            getWinLinesData(initParams.getWinLinesSelected(), initParams.getReelsSelected()));
+                    message.setWinLineData(winLineData);
+                    message.setActiveWinLines(initParams.getWinLinesSelected());
+                    message.setActiveReels(initParams.getReelsSelected());
+                    message.setBalance(new BigDecimal("5000"));
+                    message.setMessage(message.getStatus().getMessageBody());
+                    LOGGER.info("Game configured successfully");
+                    LOGGER.info("Full response: " + message);
+                    sessions.put(token, message);
+                    return message;
+                } else {
+                    Message messageError = messageFactory.createMessage(Status.CONFIGURATION_NOT_ACCEPTED);
+                    messageError.setStatus(Status.CONFIGURATION_NOT_ACCEPTED);
+                    messageError.setMessage(messageError.getStatus().getMessageBody());
+                    LOGGER.warn("ERROR - No wins calculated for this configuration");
+                    return messageError;
+                }
             }
         } else {
             return incorrectData();
