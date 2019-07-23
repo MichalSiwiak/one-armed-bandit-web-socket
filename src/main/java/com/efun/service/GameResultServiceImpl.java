@@ -39,4 +39,11 @@ public class GameResultServiceImpl implements GameResultService {
         GameResult gameResult = mongoTemplate.findOne(query, GameResult.class);
         return gameResult;
     }
+
+    @Override
+    public void delete(String gameId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("gameId").is(gameId));
+        mongoTemplate.remove(query, GameResult.class);
+    }
 }

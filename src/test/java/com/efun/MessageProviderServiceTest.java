@@ -52,11 +52,11 @@ public class MessageProviderServiceTest {
         initParams.setReelsSelected(activeReels);
         initParams.setWinLinesSelected(winLines);
 
-        Message messageStart = messageProviderService.startGame(initParams, "testId");
+        Message messageStart = messageProviderService.startGame(initParams, "5DB1A1C5B5F04A226780422E018219BE");
 
         SpinParams spinParams = new SpinParams();
         spinParams.setAuthorizationToken(messageStart.getAuthorizationToken());
-        spinParams.setGameId("testId");
+        spinParams.setGameId("5DB1A1C5B5F04A226780422E018219BE");
         spinParams.setBet("50");
         spinParams.setRno("6000044"); // tested value - please type different rno int from 1 to some big value
 

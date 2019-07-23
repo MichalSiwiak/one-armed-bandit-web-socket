@@ -139,10 +139,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             setConnectedFalse();
         }
         if (message.status == 'UNAUTHORIZED') {
-            $("#reels3").hide();
-            $("#reels4").hide();
-            $("#reels5").hide();
-            setConnectedFalse();
+
         }
 
     }

@@ -1,6 +1,7 @@
 package com.efun.validation;
 
 import com.efun.config.GameConfig;
+import com.efun.message.EndParams;
 import com.efun.message.InitParams;
 import com.efun.message.SpinParams;
 import com.efun.web.GameController;
@@ -78,7 +79,10 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     @Override
-    public boolean validateEndParams(String token, String gameId) {
+    public boolean validateEndParams(EndParams endParams) {
+
+        String token = endParams.getAuthorizationToken();
+        String gameId = endParams.getGameId();
 
         if (token != null && gameId != null) {
             boolean validation = gameId.length() == 32 && token.length() == 32;

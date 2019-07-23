@@ -1,5 +1,6 @@
 package com.efun;
 
+import com.efun.message.EndParams;
 import com.efun.message.InitParams;
 import com.efun.message.SpinParams;
 import com.efun.validation.ValidationService;
@@ -78,42 +79,58 @@ public class ValidationServiceTest {
 
         activeWinLines = null;
         activeReels = Arrays.asList(0, 1, 2, 3, 4);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
         activeReels = null;
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = null;
         activeReels = null;
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
         activeReels = Arrays.asList(0, 1, 2, 3, 4);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4Cd";
         assertEquals(true, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
         activeReels = Arrays.asList(0, 1, 2, 3, 4, 6);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5);
         activeReels = Arrays.asList(0, 1, 2, 3);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(true, validationService.validateInitParams(initParams, gameId));
 
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
         activeReels = Arrays.asList(0, 1, 9, 2, 3, 4);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4C";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
         activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
         activeReels = Arrays.asList(0, 1, 2, 3, 4);
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
         gameId = "E511F38719441CB0C238E9F24727AC4Cd";
         assertEquals(false, validationService.validateInitParams(initParams, gameId));
 
@@ -121,32 +138,32 @@ public class ValidationServiceTest {
 
     @Test
     public void validateEndParamsTest() {
-        String gameId;
-        String token;
 
-        gameId = "E511F38719441CB0C238E9F24727AC4C";
-        token = "E511F38719441CB0C238E9F24727AC4C";
-        assertEquals(true, validationService.validateEndParams(token, gameId));
+        EndParams endParams= new EndParams();
 
-        gameId = "E511F38719441CB0C238E9F24727ACdd4C";
-        token = "E511F38719441CB0C238E9F24727AC4C";
-        assertEquals(false, validationService.validateEndParams(token, gameId));
+        endParams.setAuthorizationToken("E511F38719441CB0C238E9F24727AC4C");
+        endParams.setGameId("E511F38719441CB0C238E9F24727AC4C");
+        assertEquals(true, validationService.validateEndParams(endParams));
 
-        gameId = "";
-        token = "E511F38719441CB0C238E9F24727AC4C";
-        assertEquals(false, validationService.validateEndParams(token, gameId));
+        endParams.setAuthorizationToken("E511F38719441CBdd0C238E9F24727AC4C");
+        endParams.setGameId("E511F38719441CB0C238E9F24727AC4C");
+        assertEquals(false, validationService.validateEndParams(endParams));
 
-        gameId = "E511F38719441CB0C238E9F24727AC4C";
-        token = "";
-        assertEquals(false, validationService.validateEndParams(token, gameId));
+        endParams.setAuthorizationToken("");
+        endParams.setGameId("E511F38719441CB0C238E9F24727AC4C");
+        assertEquals(false, validationService.validateEndParams(endParams));
 
-        gameId = "E511F38719441CB0C238E9F24727AC4C";
-        token = null;
-        assertEquals(false, validationService.validateEndParams(token, gameId));
+        endParams.setAuthorizationToken("E511F38719441CB0C238E9F24727AC4C");
+        endParams.setGameId("");
+        assertEquals(false, validationService.validateEndParams(endParams));
 
-        gameId = null;
-        token = null;
-        assertEquals(false, validationService.validateEndParams(token, gameId));
+        endParams.setAuthorizationToken("E511F38719441CB0C238E9F24727AC4C");
+        endParams.setGameId(null);
+        assertEquals(false, validationService.validateEndParams(endParams));
+
+        endParams.setAuthorizationToken(null);
+        endParams.setGameId(null);
+        assertEquals(false, validationService.validateEndParams(endParams));
     }
 
 

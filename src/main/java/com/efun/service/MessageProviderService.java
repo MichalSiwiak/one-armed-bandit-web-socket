@@ -8,6 +8,6 @@ public interface MessageProviderService {
 
     public Message executeSpin(SpinParams spinParams);
 
-    public Message endGame(String token, String gameId);
+    public Message endGame(EndParams endParams);
 
 }

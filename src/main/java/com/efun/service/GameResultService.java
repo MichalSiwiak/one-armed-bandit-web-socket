@@ -11,4 +11,6 @@ public interface GameResultService {
 
     public GameResult getOne(String gameId);
 
+    public void delete(String gameId);
+
 }

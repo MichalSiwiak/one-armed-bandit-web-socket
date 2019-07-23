@@ -193,9 +193,12 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * @author Michał Siwiak
      */
     @Override
-    public Message endGame(String token, String gameId) {
+    public Message endGame(EndParams endParams) {
 
-        boolean validation = validationService.validateEndParams(token, gameId);
+        String token = endParams.getAuthorizationToken();
+        String gameId = endParams.getGameId();
+
+        boolean validation = validationService.validateEndParams(endParams);
 
         if (validation) {
             if (tokenServiceHandler.authorizeRequest(gameId, token, sessions)) {
@@ -209,7 +212,6 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 sessions.remove(token);
                 tokenServiceHandler.removeToken(token);
                 LOGGER.info("The game was closed successfully");
-                LOGGER.info("Databases of game was dropped");
 
                 return messageEnd;
 

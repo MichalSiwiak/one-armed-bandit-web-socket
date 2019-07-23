@@ -34,7 +34,7 @@ public class CheckResultServiceTest {
         activeReels.add(3);
         activeReels.add(4);
 
-        int rnoMax = 500;
+        int rnoMax = 1000;
 
         for (int rno = 1; rno <= rnoMax; rno++) {
 

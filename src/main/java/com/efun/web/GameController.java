@@ -176,11 +176,11 @@ public class GameController {
     @SendTo("/game/end-game/{gameId}")
     public Message endGame(@DestinationVariable String gameId, EndParams endParams) throws Exception {
 
-        LOGGER.info("End game params " + endParams.getAuthorizationToken());
-        Message message = messageProviderService.endGame(endParams.getAuthorizationToken(), endParams.getGameId());
+        LOGGER.info("End game params " + endParams.toString());
+        Message message = messageProviderService.endGame(endParams);
         LOGGER.info("Message sent to client [END]");
 
-        if (message.getStatus().equals(Status.NEW)) {
+        if (message.getStatus().equals(Status.TERMINATED)) {
 
             GameResult gameResult = gameResultService.getOne(gameId);
             gameResult.setStatus(Status.TERMINATED.toString());

@@ -46,11 +46,11 @@ public class BalanceTest {
         InitParams initParams = new InitParams();
         initParams.setReelsSelected(activeReels);
         initParams.setWinLinesSelected(activeWinLines);
-        Message messageStart = messageProviderService.startGame(initParams, "testId");
+        Message messageStart = messageProviderService.startGame(initParams, "06D684E313E76C76764A699B3C19C2BD");
 
         SpinParams spinParams = new SpinParams();
         spinParams.setAuthorizationToken(messageStart.getAuthorizationToken());
-        spinParams.setGameId("testId");
+        spinParams.setGameId("06D684E313E76C76764A699B3C19C2BD");
         String bet = "100";
         spinParams.setRno("50");
         spinParams.setBet(bet);
@@ -58,7 +58,7 @@ public class BalanceTest {
 
         BigDecimal balanceInit = new BigDecimal("5000");
 
-        for (int i = 1; i <= 5000; i++) {
+        for (int i = 1; i <= 1000; i++) {
 
             spinParams.setRno(String.valueOf(i));
             Message messageSpin = messageProviderService.executeSpin(spinParams);
