@@ -207,6 +207,9 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
                 messageEnd.setGameId(messageActive.getGameId());
                 messageEnd.setRno(messageActive.getRno());
+                messageEnd.setBalance(messageActive.getBalance());
+                messageEnd.setWin(messageActive.isWin());
+                messageEnd.setWinValue(messageActive.getWinValue());
                 messageEnd.setMessage(messageEnd.getStatus().getMessageBody());
 
                 sessions.remove(token);

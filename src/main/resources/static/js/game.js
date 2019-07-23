@@ -32,6 +32,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             stompClient.subscribe('/game/spin-game/' + gameId, function (message) {
                 showMessage(JSON.parse(message.body));
                 symbols = JSON.parse(message.body).symbols;
+                var balance = JSON.parse(message.body).balance;
                 if (symbols.length == 3) {
                     updateIconsForThreeReels(symbols);
                 } else if (symbols.length == 4) {
@@ -39,6 +40,11 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
                 } else {
                     updateIconsForFiveReels(symbols);
                 }
+
+                if (balance <= 0){
+                    endGame();
+                }
+
             });
             stompClient.subscribe('/game/end-game/' + gameId, function (message) {
                 showMessage(JSON.parse(message.body));
@@ -82,7 +88,6 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             $("#reels-select").prop("disabled", false);
             $("#connect").prop("disabled", true);
         }
-
 
         $timeout(function () {
             updateGame()
@@ -138,10 +143,10 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             $("#reels5").hide();
             setConnectedFalse();
         }
-        if (message.status == 'UNAUTHORIZED') {
 
+        if (message.balance <= 0){
+            $("#message").text("Game is closed due to lack of funds");
         }
-
     }
 
     function updateIconsForThreeReels(symbols) {
