@@ -1,6 +1,7 @@
 package com.efun;
 
 import com.efun.config.GameConfig;
+import com.efun.message.InitParams;
 import com.efun.message.Message;
 import com.efun.message.SpinParams;
 import com.efun.service.CheckResultService;
@@ -47,8 +48,11 @@ public class MessageProviderServiceTest {
         activeReels.add(3);
 
         List<Integer> winLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
+        InitParams initParams = new InitParams();
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(winLines);
 
-        Message messageStart = messageProviderService.startGame(winLines, activeReels, "testId");
+        Message messageStart = messageProviderService.startGame(initParams, "testId");
 
         SpinParams spinParams = new SpinParams();
         spinParams.setAuthorizationToken(messageStart.getAuthorizationToken());

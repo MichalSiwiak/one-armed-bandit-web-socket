@@ -5,6 +5,7 @@ import com.efun.components.WinLineData;
 import com.efun.config.GameConfig;
 import com.efun.constants.Status;
 import com.efun.message.*;
+import com.efun.validation.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,19 +31,23 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private TokenServiceHandler tokenServiceHandler;
     private CheckResultService checkResultService;
     private WinCheckerService winCheckerService;
+    private ValidationService validationService;
 
 
     public MessageProviderServiceImpl(MessageFactory messageFactory,
                                       GameConfig gameConfig,
                                       TokenServiceHandler tokenServiceHandler,
                                       CheckResultService checkResultService,
-                                      WinCheckerService winCheckerService) {
+                                      WinCheckerService winCheckerService,
+                                      ValidationService validationService) {
 
         this.messageFactory = messageFactory;
         this.gameConfig = gameConfig;
         this.tokenServiceHandler = tokenServiceHandler;
         this.checkResultService = checkResultService;
         this.winCheckerService = winCheckerService;
+        this.validationService = validationService;
+
     }
 
     private Map<String, Message> sessions = new ConcurrentHashMap<>();
@@ -63,38 +68,17 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      * @author Michał Siwiak
      */
     @Override
-    public Message startGame(List<Integer> activeWinLines, List<Integer> activeReels, String gameId) {
+    public Message startGame(InitParams initParams, String gameId) {
 
-        if (sessions.size() > maxGameNumber - 1) {
-
-            Message messageError = messageFactory.createMessage(Status.LIMIT_REACHED);
-            messageError.setMessage(messageError.getStatus().getMessageBody());
-            LOGGER.warn("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
-            return messageError;
-
-        } else {
-            Message message = messageFactory.createMessage(Status.NEW);
-            String token = tokenServiceHandler.generateToken(gameId, sessions);
-
-            message.setAuthorizationToken(token);
-            message.setGameId(gameId);
-            LOGGER.info("Generated authorization=" + token);
-
-            int randomRno = getRandomNumberInRange(1, maxRno);
-            message.setRno(randomRno);
-            LOGGER.info("The random RNO is=" + randomRno);
-
-            WinLineData winLineData = new WinLineData(winCheckerService.getWinLinesData(activeWinLines, activeReels));
-            message.setWinLineData(winLineData);
-            message.setActiveWinLines(activeWinLines);
-            message.setActiveReels(activeReels);
-            message.setBalance(new BigDecimal("5000"));
-            message.setMessage(message.getStatus().getMessageBody());
-            LOGGER.info("Game configured successfully");
-            LOGGER.info("Full response: " + message);
-            sessions.put(token, message);
-            return message;
-            /*
+        boolean validation = validationService.validateInitParams(initParams, gameId);
+        if (validation) {
+            if (sessions.size() > maxGameNumber - 1) {
+                Message messageError = messageFactory.createMessage(Status.LIMIT_REACHED);
+                messageError.setMessage(messageError.getStatus().getMessageBody());
+                LOGGER.warn("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
+                return messageError;
+            } else {
+             /*
             if (wins.size() != 0) {
                //To Implement
             } else {
@@ -103,11 +87,33 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 messageError.setMessage(messageError.getStatus().getMessageBody());
                 LOGGER.warn("ERROR - No wins calculated for this configuration");
                 return messageError;
-
             }*/
+                Message message = messageFactory.createMessage(Status.NEW);
+                String token = tokenServiceHandler.generateToken(gameId, sessions);
+
+                message.setAuthorizationToken(token);
+                message.setGameId(gameId);
+                LOGGER.info("Generated authorization=" + token);
+                int randomRno = getRandomNumberInRange(1, maxRno);
+                message.setRno(randomRno);
+                LOGGER.info("The random RNO is=" + randomRno);
+
+                WinLineData winLineData = new WinLineData(winCheckerService.
+                        getWinLinesData(initParams.getWinLinesSelected(), initParams.getReelsSelected()));
+                message.setWinLineData(winLineData);
+                message.setActiveWinLines(initParams.getWinLinesSelected());
+                message.setActiveReels(initParams.getReelsSelected());
+                message.setBalance(new BigDecimal("5000"));
+                message.setMessage(message.getStatus().getMessageBody());
+                LOGGER.info("Game configured successfully");
+                LOGGER.info("Full response: " + message);
+                sessions.put(token, message);
+                return message;
+            }
+        } else {
+            return incorrectData();
         }
     }
-
 
     /**
      * Method creating message when client is executing spins.
@@ -124,50 +130,54 @@ public class MessageProviderServiceImpl implements MessageProviderService {
      */
     @Override
     public Message executeSpin(SpinParams spinParams) {
+        boolean validation = validationService.validateSpinParams(spinParams);
 
-        if (tokenServiceHandler.authorizeRequest(spinParams.getGameId(), spinParams.getAuthorizationToken(), sessions)) {
+        if (validation) {
+            if (tokenServiceHandler.authorizeRequest(spinParams.getGameId(), spinParams.getAuthorizationToken(), sessions)) {
 
-            Message messageStarted = sessions.get(spinParams.getAuthorizationToken());
-            Message messageSpin = messageFactory.createMessage(Status.ACTIVE);
-            messageSpin.setGameId(messageStarted.getGameId());
-            messageSpin.setWinLineData(messageStarted.getWinLineData());
+                Message messageStarted = sessions.get(spinParams.getAuthorizationToken());
+                Message messageSpin = messageFactory.createMessage(Status.ACTIVE);
+                messageSpin.setGameId(messageStarted.getGameId());
+                messageSpin.setWinLineData(messageStarted.getWinLineData());
 
-            messageSpin.setRno(Integer.parseInt(spinParams.getRno()));
-            LOGGER.info("Spin was started ... ");
-            LOGGER.info("Getting RandomNumberResult from database RNO=" + Integer.parseInt(spinParams.getRno()));
+                messageSpin.setRno(Integer.parseInt(spinParams.getRno()));
+                LOGGER.info("Spin was started ... ");
+                LOGGER.info("Getting RandomNumberResult from database RNO=" + Integer.parseInt(spinParams.getRno()));
 
-            List<Integer> activeReels = messageStarted.getActiveReels();
-            List<Integer> activeWinLines = messageStarted.getActiveWinLines();
+                List<Integer> activeReels = messageStarted.getActiveReels();
+                List<Integer> activeWinLines = messageStarted.getActiveWinLines();
 
-            List<List<Integer>> symbols =
-                    checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, Integer.parseInt(spinParams.getRno()));
+                List<List<Integer>> symbols =
+                        checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, Integer.parseInt(spinParams.getRno()));
 
-            messageStarted.setBalance(messageStarted.getBalance().subtract(new BigDecimal(spinParams.getBet())));
-            symbols = checkResultService.getFirst3Symbols(symbols);
-            messageSpin.setSymbols(symbols);
+                messageStarted.setBalance(messageStarted.getBalance().subtract(new BigDecimal(spinParams.getBet())));
+                symbols = checkResultService.getFirst3Symbols(symbols);
+                messageSpin.setSymbols(symbols);
 
-            boolean isWin = winCheckerService.isWin(symbols, activeReels, activeWinLines);
-            messageSpin.setWin(isWin);
+                boolean isWin = winCheckerService.isWin(symbols, activeReels, activeWinLines);
+                messageSpin.setWin(isWin);
 
-            TotalWinInSpin wins = winCheckerService.getWins(symbols, activeReels, activeWinLines);
-            BigDecimal valueInSpinWithBet = wins.getTotalMultiply().multiply(new BigDecimal(spinParams.getBet()));
+                TotalWinInSpin wins = winCheckerService.getWins(symbols, activeReels, activeWinLines);
+                BigDecimal valueInSpinWithBet = wins.getTotalMultiply().multiply(new BigDecimal(spinParams.getBet()));
 
-            messageStarted.setBalance(messageStarted.getBalance().add(valueInSpinWithBet));
-            messageSpin.setBalance(messageStarted.getBalance());
+                messageStarted.setBalance(messageStarted.getBalance().add(valueInSpinWithBet));
+                messageSpin.setBalance(messageStarted.getBalance());
 
-            messageSpin.setWinValue(valueInSpinWithBet);
-            messageSpin.setMessage(messageSpin.getStatus().getMessageBody());
+                messageSpin.setWinValue(valueInSpinWithBet);
+                messageSpin.setMessage(messageSpin.getStatus().getMessageBody());
 
-            LOGGER.info("Spin executed successfully RNO=" + spinParams.getRno() + " Win=" + valueInSpinWithBet);
-            LOGGER.info("Full response: " + messageSpin);
+                LOGGER.info("Spin executed successfully RNO=" + spinParams.getRno() + " Win=" + valueInSpinWithBet);
+                LOGGER.info("Full response: " + messageSpin);
+                return messageSpin;
 
-            return messageSpin;
-
+            } else {
+                Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
+                messageError.setMessage(messageError.getStatus().getMessageBody());
+                LOGGER.warn("ERROR - Unknown authorization of game");
+                return messageError;
+            }
         } else {
-            Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
-            messageError.setMessage(messageError.getStatus().getMessageBody());
-            LOGGER.warn("ERROR - Unknown authorization of game");
-            return messageError;
+            return incorrectData();
         }
     }
 
@@ -185,27 +195,40 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     @Override
     public Message endGame(String token, String gameId) {
 
-        if (tokenServiceHandler.authorizeRequest(gameId, token, sessions)) {
-            Message messageActive = sessions.get(token);
-            Message messageEnd = messageFactory.createMessage(Status.TERMINATED);
+        boolean validation = validationService.validateEndParams(token, gameId);
 
-            messageEnd.setGameId(messageActive.getGameId());
-            messageEnd.setRno(messageActive.getRno());
-            messageEnd.setMessage(messageEnd.getStatus().getMessageBody());
+        if (validation) {
+            if (tokenServiceHandler.authorizeRequest(gameId, token, sessions)) {
+                Message messageActive = sessions.get(token);
+                Message messageEnd = messageFactory.createMessage(Status.TERMINATED);
 
-            sessions.remove(token);
-            tokenServiceHandler.removeToken(token);
-            LOGGER.info("The game was closed successfully");
-            LOGGER.info("Databases of game was dropped");
+                messageEnd.setGameId(messageActive.getGameId());
+                messageEnd.setRno(messageActive.getRno());
+                messageEnd.setMessage(messageEnd.getStatus().getMessageBody());
 
-            return messageEnd;
+                sessions.remove(token);
+                tokenServiceHandler.removeToken(token);
+                LOGGER.info("The game was closed successfully");
+                LOGGER.info("Databases of game was dropped");
 
+                return messageEnd;
+
+            } else {
+                Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
+                messageError.setMessage(messageError.getStatus().getMessageBody());
+                LOGGER.warn("ERROR - Unknown authorization of game");
+                return messageError;
+            }
         } else {
-            Message messageError = messageFactory.createMessage(Status.UNAUTHORIZED);
-            messageError.setMessage(messageError.getStatus().getMessageBody());
-            LOGGER.warn("ERROR - Unknown authorization of game");
-            return messageError;
+            return incorrectData();
         }
+    }
+
+    private Message incorrectData() {
+        Message messageError = messageFactory.createMessage(Status.INCORRECT_DATA);
+        messageError.setMessage(messageError.getStatus().getMessageBody());
+        LOGGER.warn("ERROR - Incorrect data has been sent");
+        return messageError;
     }
 
     public static int getRandomNumberInRange(int min, int max) {

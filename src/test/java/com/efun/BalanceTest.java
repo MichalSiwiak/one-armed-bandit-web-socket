@@ -3,6 +3,7 @@ package com.efun;
 
 import com.efun.components.ResultWin;
 import com.efun.config.GameConfig;
+import com.efun.message.InitParams;
 import com.efun.message.Message;
 import com.efun.message.SpinParams;
 import com.efun.service.CheckResultService;
@@ -42,7 +43,10 @@ public class BalanceTest {
 
         List<Integer> activeReels = Arrays.asList(0, 1, 2);
         List<Integer> activeWinLines = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
-        Message messageStart = messageProviderService.startGame(activeWinLines, activeReels, "testId");
+        InitParams initParams = new InitParams();
+        initParams.setReelsSelected(activeReels);
+        initParams.setWinLinesSelected(activeWinLines);
+        Message messageStart = messageProviderService.startGame(initParams, "testId");
 
         SpinParams spinParams = new SpinParams();
         spinParams.setAuthorizationToken(messageStart.getAuthorizationToken());

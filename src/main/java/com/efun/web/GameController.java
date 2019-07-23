@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,18 +30,12 @@ public class GameController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
     private MessageProviderService messageProviderService;
     private GameResultService gameResultService;
-    private ValidationService validationService;
-    private MessageFactory messageFactory;
 
     public GameController(MessageProviderService messageProviderService,
-                          GameResultService gameResultService,
-                          ValidationService validationService,
-                          MessageFactory messageFactory) {
+                          GameResultService gameResultService) {
 
         this.messageProviderService = messageProviderService;
         this.gameResultService = gameResultService;
-        this.validationService = validationService;
-        this.messageFactory = messageFactory;
     }
 
     @GetMapping("/demo-game")
@@ -72,7 +67,6 @@ public class GameController {
         return new ResponseEntity<>(gameDtoList, HttpStatus.OK);
     }
 
-
     @MessageMapping("/results")
     @SendTo("/game/results-game")
     public GameResult updateGame(Map<String, String> tokens) throws Exception {
@@ -91,28 +85,28 @@ public class GameController {
      */
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
-    public Message startGame(@DestinationVariable String gameId, InitParams initParams) throws Exception {
-        LOGGER.info("Init params " + initParams.toString());
-        Message message = messageProviderService
-                .startGame(initParams.getWinLinesSelected(), initParams.getReelsSelected(), gameId);
-        LOGGER.info("Message sent to client [Start Game]");
+    public Message startGame(@DestinationVariable String gameId, InitParams initParams) {
+            LOGGER.info("Init params " + initParams.toString());
+            Message message = messageProviderService
+                    .startGame(initParams, gameId);
+            LOGGER.info("Message sent to client [Start Game]");
 
-        if (message.getStatus().equals(Status.NEW)) {
+            if (message.getStatus().equals(Status.NEW)) {
 
-            GameResult gameResult = new GameResult();
-            gameResult.setGameId(gameId);
-            gameResult.setAuthorizationToken(message.getAuthorizationToken());
-            gameResult.setWinlineData(message.getWinLineData());
-            gameResult.setStartDate(new Date());
-            gameResult.setStatus(Status.NEW.toString());
+                GameResult gameResult = new GameResult();
+                gameResult.setGameId(gameId);
+                gameResult.setAuthorizationToken(message.getAuthorizationToken());
+                gameResult.setWinlineData(message.getWinLineData());
+                gameResult.setStartDate(new Date());
+                gameResult.setStatus(Status.NEW.toString());
+                LOGGER.info("Saving changes to mongo database ...");
+                gameResultService.save(gameResult);
+                LOGGER.info("Inserted new record");
 
-            LOGGER.info("Saving changes to mongo database ...");
-            gameResultService.save(gameResult);
-            LOGGER.info("Inserted new record");
-        } else {
-            LOGGER.info("Status invalid - no records inserted");
-        }
-        return message;
+            } else {
+                LOGGER.info(message.getStatus().getMessageBody());
+            }
+            return message;
     }
 
     /**
@@ -127,11 +121,10 @@ public class GameController {
     @SendTo("/game/spin-game/{gameId}")
     public Message spinGame(@DestinationVariable String gameId, SpinParams spinParams) throws Exception {
         LOGGER.info("Spin params " + spinParams.toString());
+        Message message = messageProviderService.executeSpin(spinParams);
+        LOGGER.info("Message sent to client [Spin]");
 
-        if (validationService.validateSpin(spinParams)) {
-            Message message = messageProviderService.executeSpin(spinParams);
-
-            LOGGER.info("Message sent to client [Spin]");
+        if (message.getStatus().equals(Status.ACTIVE)) {
 
             GameResult gameResult = gameResultService.getOne(gameId);
             List<Integer> spinList = gameResult.getSpinList();
@@ -165,35 +158,40 @@ public class GameController {
             LOGGER.info("Saving changes to mongo database ...");
             gameResultService.save(gameResult);
             LOGGER.info("Changes saved of spin");
-            return message;
         } else {
-            return messageFactory.createMessage(Status.INCORRECT_DATA);
+            LOGGER.info(message.getStatus().getMessageBody());
         }
+        return message;
     }
 
     /**
      * Method mapping request and responses of web socket when game is closing
      *
      * @param @DestinationVariable String gameId
-     * @param EndParams endParams
+     * @param EndParams            endParams
      * @return MessageGameEnd endGame
      * @author Michał Siwiak
      */
     @MessageMapping("/end/{gameId}")
     @SendTo("/game/end-game/{gameId}")
     public Message endGame(@DestinationVariable String gameId, EndParams endParams) throws Exception {
+
         LOGGER.info("End game params " + endParams.getAuthorizationToken());
         Message message = messageProviderService.endGame(endParams.getAuthorizationToken(), endParams.getGameId());
         LOGGER.info("Message sent to client [END]");
 
-        GameResult gameResult = gameResultService.getOne(gameId);
-        gameResult.setStatus(Status.TERMINATED.toString());
-        gameResult.setEndDate(new Date());
+        if (message.getStatus().equals(Status.NEW)) {
 
-        LOGGER.info("Saving changes to mongo database ...");
-        gameResultService.save(gameResult);
-        LOGGER.info("Changes saved of end game");
+            GameResult gameResult = gameResultService.getOne(gameId);
+            gameResult.setStatus(Status.TERMINATED.toString());
+            gameResult.setEndDate(new Date());
+            LOGGER.info("Saving changes to mongo database ...");
+            gameResultService.save(gameResult);
+            LOGGER.info("Changes saved of end game");
 
+        } else {
+            LOGGER.info(message.getStatus().getMessageBody());
+        }
         return message;
     }
 }
