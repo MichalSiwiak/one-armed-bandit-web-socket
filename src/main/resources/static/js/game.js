@@ -11,6 +11,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
     var rno;
     var token;
     var symbols;
+    var lackOfFunds = false;
 
     function connect() {
         getSessionId();
@@ -41,13 +42,17 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
                     updateIconsForFiveReels(symbols);
                 }
 
-                if (balance <= 0){
+                if (balance <= 0) {
                     endGame();
+                    lackOfFunds = true;
                 }
 
             });
             stompClient.subscribe('/game/end-game/' + gameId, function (message) {
                 showMessage(JSON.parse(message.body));
+                if (lackOfFunds) {
+                    $("#message").text("Game is closed due to lack of funds");
+                }
             });
         });
     }
@@ -142,10 +147,6 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             $("#reels4").hide();
             $("#reels5").hide();
             setConnectedFalse();
-        }
-
-        if (message.balance <= 0){
-            $("#message").text("Game is closed due to lack of funds");
         }
     }
 

@@ -19,5 +19,6 @@ public class MessageGameSpin extends Message {
         setWin(super.isWin());
         setMessage(super.getMessage());
         setBalance(super.getBalance());
+        setTotalWinInSpin(super.getTotalWinInSpin());
     }
 }

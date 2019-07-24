@@ -1,6 +1,7 @@
 package com.efun.components;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ResultWin {
 
@@ -67,5 +68,22 @@ public class ResultWin {
                 ", equalValues=" + equalValues +
                 ", indexes=" + indexes +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResultWin resultWin = (ResultWin) o;
+        return index == resultWin.index &&
+                multiply == resultWin.multiply &&
+                reels == resultWin.reels &&
+                Objects.equals(equalValues, resultWin.equalValues) &&
+                Objects.equals(indexes, resultWin.indexes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, multiply, reels, equalValues, indexes);
     }
 }

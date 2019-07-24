@@ -4,6 +4,7 @@ import com.efun.components.TotalWinInSpin;
 import com.efun.components.WinLineData;
 import com.efun.config.GameConfig;
 import com.efun.constants.Status;
+import com.efun.entity.CombinationResult;
 import com.efun.message.*;
 import com.efun.validation.ValidationService;
 import org.slf4j.Logger;
@@ -27,28 +28,28 @@ public class MessageProviderServiceImpl implements MessageProviderService {
     private int maxGameNumber;
 
     private MessageFactory messageFactory;
-    private GameConfig gameConfig;
     private TokenServiceHandler tokenServiceHandler;
     private CheckResultService checkResultService;
     private WinCheckerService winCheckerService;
     private ValidationService validationService;
     private RnoInformationService rnoInformationService;
+    private CombinationService combinationService;
 
     public MessageProviderServiceImpl(MessageFactory messageFactory,
-                                      GameConfig gameConfig,
                                       TokenServiceHandler tokenServiceHandler,
                                       CheckResultService checkResultService,
                                       WinCheckerService winCheckerService,
                                       ValidationService validationService,
-                                      RnoInformationService rnoInformationService) {
+                                      RnoInformationService rnoInformationService,
+                                      CombinationService combinationService) {
 
         this.messageFactory = messageFactory;
-        this.gameConfig = gameConfig;
         this.tokenServiceHandler = tokenServiceHandler;
         this.checkResultService = checkResultService;
         this.winCheckerService = winCheckerService;
         this.validationService = validationService;
         this.rnoInformationService = rnoInformationService;
+        this.combinationService = combinationService;
     }
 
     private Map<String, Message> sessions = new ConcurrentHashMap<>();
@@ -79,29 +80,23 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 LOGGER.warn("ERROR - Maximum number of games has been exceeded limit=" + maxGameNumber);
                 return messageError;
             } else {
-                //should be saved in the database
                 int periodicity = rnoInformationService.
                         calculateCyclicalPositionOfReels(initParams.getReelsSelected());
+                List<Integer> reelsSelected = initParams.getReelsSelected();
+                Collections.sort(reelsSelected);
+                String nameOfCombinationReels = combinationService.getNameOfCombinationReels(reelsSelected);
+                List<Integer> list = combinationService.generateCombinationReels().get(nameOfCombinationReels);
+                LOGGER.info("Found combination [" + nameOfCombinationReels + "] of reels: " + list);
                 LOGGER.info("Calculated Periodicity=" + periodicity);
-                boolean ifWinIsEverPossible = true;
 
-               /* int countWins = 0;
-                for (int i = 1; i <= periodicity; i++) {
-                    List<List<Integer>> symbols =
-                            checkResultService.getReelPositionFromCacheOrCalculateAndSave(initParams.getReelsSelected(), i);
-                    symbols = checkResultService.getFirst3Symbols(symbols);
-                    boolean winCheck = winCheckerService.isWin(symbols, initParams.getReelsSelected(), initParams.getWinLinesSelected());
-                    if (winCheck) {
-                        countWins++;
-                    }
-                    ifWinIsEverPossible = ifWinIsEverPossible || winCheck;
-                }*/
+                List<CombinationResult> totalPossibleWinnings =
+                        combinationService.getTotalPossibleWinnings(nameOfCombinationReels, initParams.getWinLinesSelected());
 
-                if (ifWinIsEverPossible) {
-                    //LOGGER.info("Found number ow wins for configured game:" + countWins);
+                if (totalPossibleWinnings.size() != 0) {
+                    LOGGER.info("Found number of possible cyclical winnings=" + totalPossibleWinnings.size());
                     Message message = messageFactory.createMessage(Status.NEW);
                     String token = tokenServiceHandler.generateToken(gameId, sessions);
-
+                    message.setPeriodicity(periodicity);
                     message.setAuthorizationToken(token);
                     message.setGameId(gameId);
                     LOGGER.info("Generated authorization=" + token);
@@ -165,8 +160,10 @@ public class MessageProviderServiceImpl implements MessageProviderService {
                 List<Integer> activeReels = messageStarted.getActiveReels();
                 List<Integer> activeWinLines = messageStarted.getActiveWinLines();
 
+                int rno = Integer.parseInt(spinParams.getRno()) % messageStarted.getPeriodicity();
+
                 List<List<Integer>> symbols =
-                        checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, Integer.parseInt(spinParams.getRno()));
+                        checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, rno);
 
                 messageStarted.setBalance(messageStarted.getBalance().subtract(new BigDecimal(spinParams.getBet())));
                 symbols = checkResultService.getFirst3Symbols(symbols);
@@ -180,7 +177,7 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
                 messageStarted.setBalance(messageStarted.getBalance().add(valueInSpinWithBet));
                 messageSpin.setBalance(messageStarted.getBalance());
-
+                messageSpin.setTotalWinInSpin(wins);
                 messageSpin.setWinValue(valueInSpinWithBet);
                 messageSpin.setMessage(messageSpin.getStatus().getMessageBody());
 

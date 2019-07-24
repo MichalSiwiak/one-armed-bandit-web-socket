@@ -1,5 +1,6 @@
 package com.efun.message;
 
+import com.efun.components.TotalWinInSpin;
 import com.efun.components.WinLineData;
 import com.efun.constants.Status;
 
@@ -20,6 +21,9 @@ public abstract class Message {
     private List<Integer> activeWinLines;
     private List<Integer> activeReels;
     private boolean win;
+    //for tests only
+    private TotalWinInSpin totalWinInSpin;
+    private int periodicity;
 
     @Override
     public String toString() {
@@ -36,7 +40,25 @@ public abstract class Message {
                 ", activeWinLines=" + activeWinLines +
                 ", activeReels=" + activeReels +
                 ", win=" + win +
+                ", totalWinInSpin=" + totalWinInSpin +
+                ", periodicity=" + periodicity +
                 '}';
+    }
+
+    public int getPeriodicity() {
+        return periodicity;
+    }
+
+    public void setPeriodicity(int periodicity) {
+        this.periodicity = periodicity;
+    }
+
+    public TotalWinInSpin getTotalWinInSpin() {
+        return totalWinInSpin;
+    }
+
+    public void setTotalWinInSpin(TotalWinInSpin totalWinInSpin) {
+        this.totalWinInSpin = totalWinInSpin;
     }
 
     public Status getStatus() {

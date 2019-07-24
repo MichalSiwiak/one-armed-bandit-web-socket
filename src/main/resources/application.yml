@@ -1,7 +1,7 @@
 #the upper range of RNO
 max_random_number: 500
 #the maximum number of games supported by server
-max_game_number: 10
+max_game_number: 20
 #collection name os saved gamed ended and pending
 
 server:
