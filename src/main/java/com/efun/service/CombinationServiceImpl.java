@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,6 +102,7 @@ public class CombinationServiceImpl implements CombinationService {
 
     @Override
     public String getNameOfCombinationReels(List<Integer> activeReels) {
+        Collections.sort(activeReels);
         StringBuffer reelName = new StringBuffer();
         for (Integer integer : activeReels) {
             reelName.append(integer);

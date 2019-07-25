@@ -162,6 +162,10 @@ public class MessageProviderServiceImpl implements MessageProviderService {
 
                 int rno = Integer.parseInt(spinParams.getRno()) % messageStarted.getPeriodicity();
 
+                if (rno == 0) {
+                    rno = messageStarted.getPeriodicity();
+                }
+
                 List<List<Integer>> symbols =
                         checkResultService.getReelPositionFromCacheOrCalculateAndSave(activeReels, rno);
 

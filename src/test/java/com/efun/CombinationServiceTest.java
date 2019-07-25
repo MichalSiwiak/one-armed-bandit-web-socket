@@ -47,6 +47,7 @@ public class CombinationServiceTest {
             int cyclicalPositionOfReels = rnoInformationService.calculateCyclicalPositionOfReels(stringListMap.get(key));
             InitParams initParams = new InitParams();
             initParams.setReelsSelected(stringListMap.get(key));
+            //initParams.setWinLinesSelected(Arrays.asList(7,6));
             initParams.setWinLinesSelected(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
             Message messageStart = messageProviderService.startGame(initParams, "5DB1A1C5B5F04A226780422E018219BE");
             SpinParams spinParams = new SpinParams();
