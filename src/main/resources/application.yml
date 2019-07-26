@@ -115,7 +115,7 @@ game-config:
         - [0,3,6]
         - [1,4,7]
         - [2,5,8]
-      multiply: 1
+      multiply: 2
     # ------------------------ winLines for index 4 ---------------------
     - index: 4
       reels: 3
