@@ -17,7 +17,7 @@ public class SimulationReportEnd {
     private BigDecimal endBalance;
     private Set<Integer> indexesWins;
     private List<CombinationResult> combinationResults; //zrobić konstruktor klasy w oparciu o listę !!!!
-    //private Set<WinLine> winLineWins;
+    //private Set<WinLine> winLineWins; // dodać info które winliny wygrywały
 
 
     @Override

@@ -12,6 +12,18 @@ public class SimulationReportInit {
     private BigDecimal startingBalance;
     private BigDecimal bet;
 
+    @Override
+    public String toString() {
+        return "SimulationReportInit{" +
+                "start=" + start +
+                ", size=" + size +
+                ", activeReels=" + activeReels +
+                ", activeWinLines=" + activeWinLines +
+                ", startingBalance=" + startingBalance +
+                ", bet=" + bet +
+                '}';
+    }
+
     public BigDecimal getBet() {
         return bet;
     }

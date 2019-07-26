@@ -155,7 +155,7 @@ public class SimulationServiceImpl implements SimulationService {
         simulationReportEnd.setValueOfWins(sumOfWins.multiply(simulationReportInit.getBet()));
         simulationReportEnd.setStartingBalance(simulationReportInit.getStartingBalance());
         simulationReportEnd.setEndBalance(balance.add(simulationReportEnd.getValueOfWins()));
-        simulationReportEnd.setCombinationResults(total);
+        //simulationReportEnd.setCombinationResults(total);
 
         return simulationReportEnd;
     }

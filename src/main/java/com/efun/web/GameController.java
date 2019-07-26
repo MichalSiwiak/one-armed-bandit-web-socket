@@ -38,6 +38,11 @@ public class GameController {
         this.gameResultService = gameResultService;
     }
 
+    @GetMapping("/simulation")
+    public String showSimulation() {
+        return "report-form.html";
+    }
+
     @GetMapping("/demo-game")
     public String showTest() {
         return "game-form.html";
