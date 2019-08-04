@@ -4,15 +4,20 @@ import com.efun.components.TotalWinInSpin;
 import com.efun.config.GameConfig;
 import com.efun.entity.CombinationResult;
 import com.efun.entity.CombinationResultRepository;
+import com.efun.entity.Saver;
 import com.efun.web.GameController;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -22,13 +27,15 @@ public class CombinationServiceImpl implements CombinationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
     private RnoInformationService rnoInformationService;
     private CheckResultService checkResultService;
     private WinCheckerService winCheckerService;
     private GameConfig gameConfig;
     private MongoTemplate mongoTemplate;
     private CombinationResultRepository combinationResultRepository;
-
 
     public CombinationServiceImpl(RnoInformationService rnoInformationService,
                                   CheckResultService checkResultService,
@@ -46,7 +53,7 @@ public class CombinationServiceImpl implements CombinationService {
     }
 
     //run this method if game configuration is updated
-    //@PostConstruct
+    @PostConstruct
     private void saveAllCombinationsToDatabase() {
         //dropping collection to clear old data
         mongoTemplate.dropCollection(CombinationResult.class);
@@ -71,17 +78,30 @@ public class CombinationServiceImpl implements CombinationService {
                     calculateCyclicalPositionOfReels(combinationReelsMap.get(key));
             LOGGER.info("Please wait - possible RNOs [size: " + periodicity + "] of combination "
                     + combinationReelsMap.get(key) + " is saving ...");
-            for (int i = 1; i <= periodicity; i++) {
-                List<List<Integer>> symbols =
-                        checkResultService.getReelPositionFromCacheOrCalculateAndSave(combinationReelsMap.get(key), i);
-                symbols = checkResultService.getFirst3Symbols(symbols);
-                TotalWinInSpin totalWinInSpin = winCheckerService.getWins(symbols, combinationReelsMap.get(key), allWinLines);
 
-                CombinationResult combinationResult = new CombinationResult(key, combinationReelsMap.get(key),
-                        i, totalWinInSpin.getResultWinList());
-                combinationResult.setSymbols(symbols);
-                mongoTemplate.save(combinationResult);
+            List<Integer> numbers = new ArrayList<>();
+            for (int i = 1; i <= periodicity; i++) {
+                numbers.add(i);
             }
+            int chunkSize = 10000;
+            AtomicInteger counter = new AtomicInteger();
+            Collection<List<Integer>> result = numbers.stream()
+                    .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / chunkSize))
+                    .values();
+
+            for (List<Integer> integers : result) {
+
+                Saver saver = new Saver();
+                saver.setIntegerList(integers);
+                saver.setCombinationReelsMap(combinationReelsMap);
+                saver.setKey(key);
+                saver.setAllWinLines(allWinLines);
+
+                applicationContext.getAutowireCapableBeanFactory().autowireBean(saver);
+
+                saver.run();
+            }
+            LOGGER.info("Combination " + combinationReelsMap.get(key) + " is finished");
         }
     }
 

@@ -11,4 +11,7 @@ public interface CombinationResultRepository extends MongoRepository<Combination
     List<CombinationResult> findByRnoIsInAndCombinationIdEquals(List<Integer> rno,String combinationId );
 
     List<CombinationResult> findByCombinationIdAndNumbersOfWinsContains(String combinationId, List<Integer> numbersOfWins);
+
+    @Override
+    <S extends CombinationResult> List<S> saveAll(Iterable<S> iterable);
 }

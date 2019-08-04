@@ -4,6 +4,7 @@ import com.efun.components.ResultWin;
 import com.efun.components.TotalWinInSpin;
 import com.efun.config.GameConfig;
 import com.efun.config.WinLine;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ public class WinCheckerServiceImpl implements WinCheckerService {
     public WinCheckerServiceImpl(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
     }
+
 
     @Override
     public TotalWinInSpin getWins(List<List<Integer>> symbols,
