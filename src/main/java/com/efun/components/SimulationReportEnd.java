@@ -18,7 +18,8 @@ public class SimulationReportEnd {
     private Set<Integer> indexesWins;
     private List<CombinationResult> combinationResults; //zrobić konstruktor klasy w oparciu o listę !!!!
     //private Set<WinLine> winLineWins; // dodać info które winliny wygrywały
-
+    private List<BigDecimal> balanceChart;
+    private List<Integer> rnoScaleList;
 
     @Override
     public String toString() {
@@ -31,15 +32,10 @@ public class SimulationReportEnd {
                 ", startingBalance=" + startingBalance +
                 ", endBalance=" + endBalance +
                 ", indexesWins=" + indexesWins +
+                ", combinationResults=" + combinationResults +
+                ", balanceChart=" + balanceChart +
+                ", rnoScaleList=" + rnoScaleList +
                 '}';
-    }
-
-    public List<CombinationResult> getCombinationResults() {
-        return combinationResults;
-    }
-
-    public void setCombinationResults(List<CombinationResult> combinationResults) {
-        this.combinationResults = combinationResults;
     }
 
     public int getNumberOfSpins() {
@@ -104,5 +100,29 @@ public class SimulationReportEnd {
 
     public void setIndexesWins(Set<Integer> indexesWins) {
         this.indexesWins = indexesWins;
+    }
+
+    public List<CombinationResult> getCombinationResults() {
+        return combinationResults;
+    }
+
+    public void setCombinationResults(List<CombinationResult> combinationResults) {
+        this.combinationResults = combinationResults;
+    }
+
+    public List<BigDecimal> getBalanceChart() {
+        return balanceChart;
+    }
+
+    public void setBalanceChart(List<BigDecimal> balanceChart) {
+        this.balanceChart = balanceChart;
+    }
+
+    public List<Integer> getRnoScaleList() {
+        return rnoScaleList;
+    }
+
+    public void setRnoScaleList(List<Integer> rnoScaleList) {
+        this.rnoScaleList = rnoScaleList;
     }
 }

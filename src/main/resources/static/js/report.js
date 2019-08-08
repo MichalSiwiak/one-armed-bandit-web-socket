@@ -1,4 +1,12 @@
-var game = angular.module("ReportConfig", []);
+var game = angular.module("ReportConfig", ['zingchart-angularjs'])
+
+.filter('percentage', ['$filter', function ($filter) {
+    return function (input, decimals) {
+        return $filter('number')(input * 100, decimals) + '%';
+    };
+}]);
+
+
 game.controller("ReportConfigController", function ($scope, $http, $timeout) {
 
 
@@ -7,6 +15,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
 
     getWinLines();
     getReels();
+    _draw_chart();
 
 
     $scope.form = {
@@ -31,6 +40,8 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                 }
             }).then(function successCallback(response) {
                 $scope.message = response.data;
+                $scope.myJson.series[0].values = response.data.balanceChart;
+                $scope.myJson.scaleX.values = response.data.rnoScaleList;
             })
         }else {
             alert("Please select at least 3 numbers of reels!");
@@ -80,5 +91,115 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
         console.log('Selected reels: ' + reelsSelected);
         $scope.form.activeReels = reelsSelected;
     };
+
+    //Drawing chart
+    function _draw_chart() {
+
+
+        $scope.myJson = {
+            gui: {
+                contextMenu: {
+                    button: {
+                        visible: 0
+                    }
+                }
+            },
+            backgroundColor: "#434343",
+            globals: {
+                shadow: false,
+                fontFamily: "Helvetica"
+            },
+            type: "area",
+
+            legend: {
+                layout: "x4",
+                backgroundColor: "transparent",
+                borderColor: "transparent",
+                marker: {
+                    borderRadius: "50px",
+                    borderColor: "transparent"
+                },
+                item: {
+                    fontColor: "white"
+                }
+
+            },
+            scaleX: {
+                transform: {
+                    type: 'number'
+                },
+                zooming: true,
+                values: [],
+                lineColor: "white",
+                lineWidth: "1px",
+                tick: {
+                    lineColor: "white",
+                    lineWidth: "1px"
+                },
+                item: {
+                    fontColor: "white"
+                },
+                guide: {
+                    visible: false
+                },
+                label: {
+                    text: 'RNO',
+                    paddingTop: '15px',
+                    fontColor: 'white',
+                    fontSize: '12px'
+                }
+            },
+            scaleY: {
+                lineColor: "white",
+                lineWidth: "1px",
+                tick: {
+                    lineColor: "white",
+                    lineWidth: "1px"
+                },
+                guide: {
+                    lineStyle: "solid",
+                    lineColor: "#626262"
+                },
+                item: {
+                    fontColor: "white"
+                },
+                label: {
+                    text: 'Balance',
+                    paddingTop: '15px',
+                    fontColor: 'white',
+                    fontSize: '12px'
+                }
+            },
+            tooltip: {
+                visible: false
+            },
+            crosshairX: {
+                scaleLabel: {
+                    backgroundColor: "#fff",
+                    fontColor: "black"
+                },
+                plotLabel: {
+                    backgroundColor: "#434343",
+                    fontColor: "#FFF",
+                    "thousands-separator": ",",
+                    _text: "Number of hits : %v"
+                }
+            },
+            plot: {
+                lineWidth: "2px",
+                marker: {
+                    visible: false
+                }
+            },
+            series: [{
+                text: "Balance",
+                values: [],
+                backgroundColor1: "#4AD8CC",
+                backgroundColor2: "#272822",
+                lineColor: "#4AD8CC"
+            }]
+        };
+
+    }
 
 });

@@ -35,7 +35,7 @@ public class AvailableInitConfigController {
 
         List<AvailableInitConfig> winLines = new ArrayList<>();
         for (int i = 0; i < gameConfig.getWinnings().size(); i++) {
-            winLines.add(new AvailableInitConfig(i, "Win line " + (i + 1) + " with value " + gameConfig.getWinnings().get(i)));
+            winLines.add(new AvailableInitConfig(i, "line " + (i + 1) + " [value=" + gameConfig.getWinnings().get(i)+"]"));
         }
         return new ResponseEntity<>(winLines, HttpStatus.OK);
     }
@@ -54,7 +54,7 @@ public class AvailableInitConfigController {
 
         List<AvailableInitConfig> reels = new ArrayList<>();
         for (int i = 0; i < gameConfig.getReels().size(); i++) {
-            reels.add(new AvailableInitConfig(i, "Reel " + (i + 1) + " with size " + gameConfig.getReels().get(i).size()));
+            reels.add(new AvailableInitConfig(i, "Reel " + (i + 1) + " [size=" + gameConfig.getReels().get(i).size()+"]"));
         }
         return new ResponseEntity<>(reels, HttpStatus.OK);
     }

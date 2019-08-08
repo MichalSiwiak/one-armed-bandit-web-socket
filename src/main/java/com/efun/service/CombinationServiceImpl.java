@@ -53,8 +53,8 @@ public class CombinationServiceImpl implements CombinationService {
     }
 
     //run this method if game configuration is updated
-    @PostConstruct
-    private void saveAllCombinationsToDatabase() {
+    //@PostConstruct
+    public void saveAllCombinationsToDatabase() {
         //dropping collection to clear old data
         mongoTemplate.dropCollection(CombinationResult.class);
         List<Integer> allWinLines = new ArrayList<>();

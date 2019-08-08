@@ -2,18 +2,21 @@ package com.efun.web;
 
 import com.efun.constants.Status;
 import com.efun.entity.GameResult;
-import com.efun.message.*;
+import com.efun.message.EndParams;
+import com.efun.message.InitParams;
+import com.efun.message.Message;
+import com.efun.message.SpinParams;
 import com.efun.service.GameResultService;
 import com.efun.service.MessageProviderService;
-import com.efun.validation.ValidationService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.converter.MessageConversionException;
-import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class GameController {
@@ -40,22 +46,22 @@ public class GameController {
 
     @GetMapping("/simulation")
     public String showSimulation() {
-        return "report-form.html";
+        return "report-form";
     }
 
     @GetMapping("/demo-game")
     public String showTest() {
-        return "game-form.html";
+        return "game-form";
     }
 
     @GetMapping("/results")
     public String showSessions() {
-        return "sessions-form.html";
+        return "sessions-form";
     }
 
     @GetMapping("/description")
     public String showIndex() {
-        return "description-form.html";
+        return "description-form";
     }
 
     @RequestMapping(value = "/gameId", produces = MediaType.TEXT_PLAIN_VALUE, method = RequestMethod.GET)

@@ -5,14 +5,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class represents configuration file
  *
  * @author Michał Siwiak
  */
-@Component
-@ConfigurationProperties("game-config")
+/*@Component
+@ConfigurationProperties("game-config")*/
 public class GameConfig {
 
     private List<List<Integer>> reels = new ArrayList<>();
@@ -80,5 +81,23 @@ public class GameConfig {
 
     public void setFilterOnlyHighestResultsInWinLine(boolean filterOnlyHighestResultsInWinLine) {
         this.filterOnlyHighestResultsInWinLine = filterOnlyHighestResultsInWinLine;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GameConfig)) return false;
+        GameConfig that = (GameConfig) o;
+        return isWineLineOnlyOnAllActiveReels() == that.isWineLineOnlyOnAllActiveReels() &&
+                isFilterOnlyHighestResultsInWinLine() == that.isFilterOnlyHighestResultsInWinLine() &&
+                Objects.equals(getReels(), that.getReels()) &&
+                Objects.equals(getSpin(), that.getSpin()) &&
+                Objects.equals(getWinnings(), that.getWinnings()) &&
+                Objects.equals(getWinLines(), that.getWinLines());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getReels(), getSpin(), getWinnings(), getWinLines(), isWineLineOnlyOnAllActiveReels(), isFilterOnlyHighestResultsInWinLine());
     }
 }

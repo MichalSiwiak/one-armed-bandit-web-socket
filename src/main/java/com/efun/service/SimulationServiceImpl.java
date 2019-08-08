@@ -115,6 +115,9 @@ public class SimulationServiceImpl implements SimulationService {
         simulationReportEnd.setBet(simulationReportInit.getBet());
         Set<Integer> indexesWins = new HashSet<>();
 
+        List<BigDecimal> balanceChart = new ArrayList<>();
+        List<Integer> rnoScaleList = new ArrayList<>();
+        int rno = 1;
 
         for (CombinationResult combinationResult : total) {
             TotalWinInSpin totalWinInSpin = winCheckerService.getWins(combinationResult.getSymbols(),
@@ -146,8 +149,11 @@ public class SimulationServiceImpl implements SimulationService {
             }
             numberOfWins = numberOfWins + resultWinList.size();
             balance = balance.subtract(simulationReportInit.getBet());
-        }
 
+            balanceChart.add(balance.add(sumOfWins));
+            rnoScaleList.add(rno);
+            rno++;
+        }
 
         simulationReportEnd.setIndexesWins(indexesWins);
         simulationReportEnd.setNumberOfWins(numberOfWins);
@@ -155,6 +161,9 @@ public class SimulationServiceImpl implements SimulationService {
         simulationReportEnd.setValueOfWins(sumOfWins.multiply(simulationReportInit.getBet()));
         simulationReportEnd.setStartingBalance(simulationReportInit.getStartingBalance());
         simulationReportEnd.setEndBalance(balance.add(simulationReportEnd.getValueOfWins()));
+        simulationReportEnd.setBalanceChart(balanceChart);
+        simulationReportEnd.setRnoScaleList(rnoScaleList);
+
         //simulationReportEnd.setCombinationResults(total);
 
         return simulationReportEnd;
