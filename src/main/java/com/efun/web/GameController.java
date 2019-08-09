@@ -18,9 +18,11 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -45,7 +47,9 @@ public class GameController {
     }
 
     @GetMapping("/simulation")
-    public String showSimulation() {
+    public String showSimulation(RedirectAttributes redirectAttributes, Model model) {
+        model.addAttribute("status", "inactive");
+
         return "report-form";
     }
 
@@ -97,27 +101,27 @@ public class GameController {
     @MessageMapping("/start/{gameId}")
     @SendTo("/game/start-game/{gameId}")
     public Message startGame(@DestinationVariable String gameId, InitParams initParams) {
-            LOGGER.info("Init params " + initParams.toString());
-            Message message = messageProviderService
-                    .startGame(initParams, gameId);
-            LOGGER.info("Message sent to client [Start Game]");
+        LOGGER.info("Init params " + initParams.toString());
+        Message message = messageProviderService
+                .startGame(initParams, gameId);
+        LOGGER.info("Message sent to client [Start Game]");
 
-            if (message.getStatus().equals(Status.NEW)) {
+        if (message.getStatus().equals(Status.NEW)) {
 
-                GameResult gameResult = new GameResult();
-                gameResult.setGameId(gameId);
-                gameResult.setAuthorizationToken(message.getAuthorizationToken());
-                gameResult.setWinlineData(message.getWinLineData());
-                gameResult.setStartDate(new Date());
-                gameResult.setStatus(Status.NEW.toString());
-                LOGGER.info("Saving changes to mongo database ...");
-                gameResultService.save(gameResult);
-                LOGGER.info("Inserted new record");
+            GameResult gameResult = new GameResult();
+            gameResult.setGameId(gameId);
+            gameResult.setAuthorizationToken(message.getAuthorizationToken());
+            gameResult.setWinlineData(message.getWinLineData());
+            gameResult.setStartDate(new Date());
+            gameResult.setStatus(Status.NEW.toString());
+            LOGGER.info("Saving changes to mongo database ...");
+            gameResultService.save(gameResult);
+            LOGGER.info("Inserted new record");
 
-            } else {
-                LOGGER.info(message.getStatus().getMessageBody());
-            }
-            return message;
+        } else {
+            LOGGER.info(message.getStatus().getMessageBody());
+        }
+        return message;
     }
 
     /**

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Controller
 public class AvailableInitConfigController {
@@ -34,9 +35,9 @@ public class AvailableInitConfigController {
     public ResponseEntity<List<AvailableInitConfig>> getWinLines() {
 
         List<AvailableInitConfig> winLines = new ArrayList<>();
-        for (int i = 0; i < gameConfig.getWinnings().size(); i++) {
-            winLines.add(new AvailableInitConfig(i, "line " + (i + 1) + " [value=" + gameConfig.getWinnings().get(i)+"]"));
-        }
+        IntStream.range(0, gameConfig.getWinnings().size())
+                .forEach(i->winLines.add(new AvailableInitConfig(i, "line " + (i + 1) + " [value=" + gameConfig.getWinnings().get(i)+"]")));
+
         return new ResponseEntity<>(winLines, HttpStatus.OK);
     }
 
@@ -53,9 +54,8 @@ public class AvailableInitConfigController {
     public ResponseEntity<List<AvailableInitConfig>> getReels() {
 
         List<AvailableInitConfig> reels = new ArrayList<>();
-        for (int i = 0; i < gameConfig.getReels().size(); i++) {
-            reels.add(new AvailableInitConfig(i, "Reel " + (i + 1) + " [size=" + gameConfig.getReels().get(i).size()+"]"));
-        }
+        IntStream.range(0, gameConfig.getReels().size())
+                .forEach(i->reels.add(new AvailableInitConfig(i, "Reel " + (i + 1) + " [size=" + gameConfig.getReels().get(i).size()+"]")));
         return new ResponseEntity<>(reels, HttpStatus.OK);
     }
 

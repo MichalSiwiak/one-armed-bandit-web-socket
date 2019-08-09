@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @Service
@@ -31,22 +32,16 @@ public class CombinationServiceImpl implements CombinationService {
     private ApplicationContext applicationContext;
 
     private RnoInformationService rnoInformationService;
-    private CheckResultService checkResultService;
-    private WinCheckerService winCheckerService;
     private GameConfig gameConfig;
     private MongoTemplate mongoTemplate;
     private CombinationResultRepository combinationResultRepository;
 
     public CombinationServiceImpl(RnoInformationService rnoInformationService,
-                                  CheckResultService checkResultService,
-                                  WinCheckerService winCheckerService,
                                   GameConfig gameConfig,
                                   MongoTemplate mongoTemplate,
                                   CombinationResultRepository combinationResultRepository) {
 
         this.rnoInformationService = rnoInformationService;
-        this.checkResultService = checkResultService;
-        this.winCheckerService = winCheckerService;
         this.gameConfig = gameConfig;
         this.mongoTemplate = mongoTemplate;
         this.combinationResultRepository = combinationResultRepository;
@@ -57,18 +52,8 @@ public class CombinationServiceImpl implements CombinationService {
     public void saveAllCombinationsToDatabase() {
         //dropping collection to clear old data
         mongoTemplate.dropCollection(CombinationResult.class);
-        List<Integer> allWinLines = new ArrayList<>();
-        Set<Integer> uniqueIds = new HashSet<>();
         List<List<Integer>> reels = gameConfig.getReels();
-
-        for (List<Integer> reel : reels) {
-            for (Integer id : reel) {
-                uniqueIds.add(id);
-            }
-        }
-        for (Integer uniqueId : uniqueIds) {
-            allWinLines.add(uniqueId);
-        }
+        List<Integer> allWinLines = new ArrayList<>(reels.stream().flatMap(List::stream).collect(Collectors.toSet()));
 
         Map<String, List<Integer>> combinationReelsMap = generateCombinationReels();
         LOGGER.info("Found combination of reels: " + combinationReelsMap.size());
@@ -79,26 +64,22 @@ public class CombinationServiceImpl implements CombinationService {
             LOGGER.info("Please wait - possible RNOs [size: " + periodicity + "] of combination "
                     + combinationReelsMap.get(key) + " is saving ...");
 
-            List<Integer> numbers = new ArrayList<>();
-            for (int i = 1; i <= periodicity; i++) {
-                numbers.add(i);
-            }
+            List<Integer> numbers = IntStream.rangeClosed(1, periodicity).boxed().collect(Collectors.toList());
+
             int chunkSize = 10000;
             AtomicInteger counter = new AtomicInteger();
-            Collection<List<Integer>> result = numbers.stream()
+            Collection<List<Integer>> result = numbers
+                    .stream()
                     .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / chunkSize))
                     .values();
 
             for (List<Integer> integers : result) {
-
                 Saver saver = new Saver();
                 saver.setIntegerList(integers);
                 saver.setCombinationReelsMap(combinationReelsMap);
                 saver.setKey(key);
                 saver.setAllWinLines(allWinLines);
-
                 applicationContext.getAutowireCapableBeanFactory().autowireBean(saver);
-
                 saver.run();
             }
             LOGGER.info("Combination " + combinationReelsMap.get(key) + " is finished");

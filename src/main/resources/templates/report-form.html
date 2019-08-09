@@ -16,7 +16,8 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.standalone.min.css">
     <link rel="stylesheet" href="https://coffeecoding.net/resources/css/now-ui-kit.css" type="text/css">
     <link rel="stylesheet" href="https://coffeecoding.net/resources/css/style.css" type="text/css">
-    <link rel="icon" href="../static/img/favicon.png">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="icon" href="img/favicon.png">
     <!-- PAGE scripts -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -31,6 +32,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
     <script src="//cdn.zingchart.com/zingchart.min.js"></script>
     <script src="//cdn.zingchart.com/angular/zingchart-angularjs.js"></script>
+    <!--   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>-->
     <script src="js/report.js"></script>
 </head>
 
@@ -110,10 +112,14 @@
         </div>
         <div class="mt-4 mb-4">
             <div class="container">
+                <div style=" height: 15px;">
+                    <div th:if="${status == active}">
+                        <div class="bar"></div>
+                    </div>
+                </div>
                 <p class="lead text-left">Game simulation of big number of spins</p>
             </div>
         </div>
-
         <div class="mt-4 mb-4">
             <div class="container">
                 <div class="row">
@@ -124,9 +130,17 @@
                                 <form method="POST" enctype="multipart/form-data" action="/send">
                                     <div class="form-group"><input name="file" type="file" required="true"
                                                                    class="form-control w-100 rounded-0"></div>
-                                    <div class="form-group w-100"><input
-                                            class="btn btn-secondary form-control mr-2 w-100" type="submit"
-                                            value="Approve"></div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <button class="btn w-100 btn-secondary" type="submit" style="">Change
+                                                conf.
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4"><a class="btn w-100 btn-secondary" href="/downloadConfig">Current
+                                            conf</a></div>
+                                        <div class="col-md-4"><a class="btn w-100 btn-secondary" target="_blank"
+                                                                 href="/logs">Server logs</a></div>
+                                    </div>
                                 </form>
                                 <div th:if="${success}">
                                     <div class="alert alert-success text-white px-5 mb-0" role="alert">
@@ -247,16 +261,21 @@
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-12">
-                    <p class="lead text-left mt-0 mb-4">Graph</p>
+                    <p class="lead text-center mt-0 mb-4">Changes of account balance through a lot of games</p>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12" >
+                <div class="col-md-12">
                     <div style="box-shadow: 0px 0px 10px  grey, 0px 0px   black;"
                          zingchart="" id="chart-1" zc-json="myJson" zc-width="100%" zc-height="568px"
                          class="mb-5"></div>
                 </div>
             </div>
+            <!--<div class="row">
+                <div class="col-md-12" >
+                    <canvas id="line-chart" width="800" height="450"></canvas>
+                </div>
+            </div>-->
         </div>
     </div>
 </div>

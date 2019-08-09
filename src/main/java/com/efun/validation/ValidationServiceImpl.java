@@ -8,8 +8,10 @@ import com.efun.web.GameController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -29,16 +31,12 @@ public class ValidationServiceImpl implements ValidationService {
             List<List<Integer>> reels = gameConfig.getReels();
             List<Integer> activeReelsIndexes = new ArrayList<>();
 
-            for (int i = 0; i < reels.size(); i++) {
-                activeReelsIndexes.add(i);
-            }
+            IntStream.range(0, reels.size()).forEach(activeReelsIndexes::add);
 
             List<Double> winnings = gameConfig.getWinnings();
             List<Integer> activeWinLinesIndexes = new ArrayList<>();
 
-            for (int i = 0; i < winnings.size(); i++) {
-                activeWinLinesIndexes.add(i);
-            }
+            IntStream.range(0, winnings.size()).forEach(activeWinLinesIndexes::add);
             if (activeReelsIndexes.containsAll(initParams.getReelsSelected()) && activeWinLinesIndexes.containsAll(initParams.getWinLinesSelected())) {
                 return true;
             } else {

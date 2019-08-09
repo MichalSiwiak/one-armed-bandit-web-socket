@@ -2,8 +2,8 @@
 <configuration>
     <!--<property name="LOG_LEVEL" value="DEBUG"/>-->
     <property name="LOG_LEVEL" value="INFO"/>
-    <property name="LOG_DIR" value="/home/michal/"/>
-    <property name="LOG_FILE" value="/home/michal/log.log"/>
+    <property name="LOG_DIR" value="D:\\"/>
+    <property name="LOG_FILE" value="D:\\log.log"/>
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%marker] %logger{10} %msg [${PID:- }] [%thread]%n"/>
     <property name="MAX_LOG_FILE_NUM" value="3"/>
 

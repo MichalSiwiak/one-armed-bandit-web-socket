@@ -1,10 +1,10 @@
 var game = angular.module("ReportConfig", ['zingchart-angularjs'])
 
-.filter('percentage', ['$filter', function ($filter) {
-    return function (input, decimals) {
-        return $filter('number')(input * 100, decimals) + '%';
-    };
-}]);
+    .filter('percentage', ['$filter', function ($filter) {
+        return function (input, decimals) {
+            return $filter('number')(input * 100, decimals) + '%';
+        };
+    }]);
 
 
 game.controller("ReportConfigController", function ($scope, $http, $timeout) {
@@ -12,6 +12,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
 
     $scope.winLines = [];
     $scope.reels = [];
+    $scope.showSpinner = true;
 
     getWinLines();
     getReels();
@@ -30,7 +31,8 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
     $scope.message = null;
 
     $scope.submit = function () {
-        if (reelsSelected.length > 2){
+        if (reelsSelected.length > 2) {
+            $scope.showSpinner = false;
             $http({
                 method: "POST",
                 url: 'report',
@@ -39,11 +41,12 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                     'Content-Type': 'application/json'
                 }
             }).then(function successCallback(response) {
+                $scope.showSpinner = true;
                 $scope.message = response.data;
                 $scope.myJson.series[0].values = response.data.balanceChart;
                 $scope.myJson.scaleX.values = response.data.rnoScaleList;
             })
-        }else {
+        } else {
             alert("Please select at least 3 numbers of reels!");
         }
     };
@@ -95,7 +98,6 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
     //Drawing chart
     function _draw_chart() {
 
-
         $scope.myJson = {
             gui: {
                 contextMenu: {
@@ -104,14 +106,16 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                     }
                 }
             },
+           /* title: {
+                "text":"changes of account balance through a lot of games"
+            },*/
             backgroundColor: "#434343",
             globals: {
                 shadow: false,
                 fontFamily: "Helvetica"
             },
             type: "area",
-
-            legend: {
+         /*   legend: {
                 layout: "x4",
                 backgroundColor: "transparent",
                 borderColor: "transparent",
@@ -123,7 +127,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                     fontColor: "white"
                 }
 
-            },
+            },*/
             scaleX: {
                 transform: {
                     type: 'number'
@@ -152,6 +156,9 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
             scaleY: {
                 lineColor: "white",
                 lineWidth: "1px",
+                short:true,
+                "short-unit":"M",
+                "thousands-separator":",",
                 tick: {
                     lineColor: "white",
                     lineWidth: "1px"
@@ -161,14 +168,15 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                     lineColor: "#626262"
                 },
                 item: {
-                    fontColor: "white"
+                    fontColor: "white",
+                    fontSize: '8px'
                 },
-                label: {
-                    text: 'Balance',
+                /*label: {
+                    text: 'Balance (millions)',
                     paddingTop: '15px',
                     fontColor: 'white',
-                    fontSize: '12px'
-                }
+                    fontSize: '8px'
+                }*/
             },
             tooltip: {
                 visible: false
@@ -199,7 +207,6 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                 lineColor: "#4AD8CC"
             }]
         };
-
     }
 
 });

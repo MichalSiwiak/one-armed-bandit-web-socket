@@ -29,9 +29,7 @@ public class CombinationResult {
             this.isWin = false;
         } else {
             this.isWin = true;
-            for (ResultWin resultWin : resultWinList) {
-                numbersOfWins.add(resultWin.getEqualValues().iterator().next());
-            }
+            resultWinList.forEach(resultWin -> numbersOfWins.add(resultWin.getEqualValues().iterator().next()));
         }
     }
 

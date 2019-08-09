@@ -2,7 +2,10 @@
 max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 20
-#collection name os saved gamed ended and pending
+#path to config temp file
+path_to_config_file: D:\\conf.json
+#path to config temp file
+path_to_logs_file: D:\log.log
 
 server:
   port: 8090

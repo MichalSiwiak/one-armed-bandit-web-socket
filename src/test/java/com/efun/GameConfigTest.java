@@ -48,7 +48,6 @@ public class GameConfigTest {
         //and size of set of unique ids must equal to winnings array
         assertEquals(uniqueIds.size(), gameConfig.getWinnings().size());
 
-
         List<WinLine> winLines = gameConfig.getWinLines();
         for (WinLine winLine : winLines) {
             List<List<Integer>> positions = winLine.getPositions();

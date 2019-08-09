@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class SimulationServiceImpl implements SimulationService {
@@ -34,7 +35,6 @@ public class SimulationServiceImpl implements SimulationService {
         this.gameConfig = gameConfig;
     }
 
-
     //dodac zmienna wygrana na każdym spinie i zaprezentowac dane na wykresie
     @Override
     public SimulationReportEnd generateLotOFSpins(SimulationReportInit simulationReportInit) {
@@ -51,9 +51,12 @@ public class SimulationServiceImpl implements SimulationService {
         List<Integer> body = new ArrayList<>();
         int bodyCount;
 
-        for (int i = 1; i <= periodicity; i++) {
+        IntStream.rangeClosed(1, periodicity).forEach(body::add);
+
+       /* for (int i = 1; i <= periodicity; i++) {
             body.add(i);
-        }
+        }*/
+
         if (start != 0) {
             for (int i = start; i <= start + (periodicity - start); i++) {
                 if (head.size() < size) {
@@ -95,9 +98,10 @@ public class SimulationServiceImpl implements SimulationService {
         if (bodyCount != 0) {
             List<CombinationResult> bodyResults
                     = combinationResultRepository.findByRnoIsInAndCombinationIdEquals(body, nameOfCombinationReels);
-            for (int i = 1; i <= bodyCount; i++) {
+           /* for (int i = 1; i <= bodyCount; i++) {
                 total.addAll(bodyResults);
-            }
+            }*/
+            IntStream.rangeClosed(1, bodyCount).forEach(index -> total.addAll(bodyResults));
         }
         if (tail.size() != 0) {
             List<CombinationResult> tailResults =
@@ -109,7 +113,6 @@ public class SimulationServiceImpl implements SimulationService {
         int numberOfWins = 0;
         BigDecimal sumOfWins = new BigDecimal("0");
         BigDecimal balance = simulationReportInit.getStartingBalance();
-
 
         simulationReportEnd.setNumberOfSpins(size);
         simulationReportEnd.setBet(simulationReportInit.getBet());
@@ -125,21 +128,18 @@ public class SimulationServiceImpl implements SimulationService {
             combinationResult.setResultWinList(totalWinInSpin.getResultWinList());
             List<Integer> numbersOfWins = new ArrayList<>();
 
-
             if (totalWinInSpin.getResultWinList().size() == 0) {
                 combinationResult.setWin(false);
             } else {
-
-                for (ResultWin resultWin : totalWinInSpin.getResultWinList()) {
+                /*for (ResultWin resultWin : totalWinInSpin.getResultWinList()) {
                     numbersOfWins.add(resultWin.getIndex());
-                }
+                }*/
+                totalWinInSpin.getResultWinList().forEach(resultWin-> numbersOfWins.add(resultWin.getIndex()));
                 combinationResult.setWin(true);
 
             }
             combinationResult.setNumbersOfWins(numbersOfWins);
-            for (Integer numbersOfWin : numbersOfWins) {
-                indexesWins.add(numbersOfWin);
-            }
+            indexesWins.addAll(numbersOfWins);
 
             List<ResultWin> resultWinList = combinationResult.getResultWinList();
             for (ResultWin resultWin : resultWinList) {

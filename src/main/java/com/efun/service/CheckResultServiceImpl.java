@@ -34,7 +34,6 @@ public class CheckResultServiceImpl implements CheckResultService {
         this.gameConfig = gameConfig;
     }
 
-
     // can be not one result !!!!
     @Override
     public List<List<Integer>> getReelPositionFromCacheOrCalculateAndSave(List<Integer> activeReels, int rno) {

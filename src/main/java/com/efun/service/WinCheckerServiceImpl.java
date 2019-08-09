@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -121,6 +122,7 @@ public class WinCheckerServiceImpl implements WinCheckerService {
                 resultsWithSizeFive.add(resultWin);
             }
         }
+
         resultWinsTemp = new ArrayList<>(resultWins);
         for (ResultWin resultSize5 : resultsWithSizeFive) {
             for (ResultWin resultWin : resultWinsTemp) {
@@ -147,9 +149,7 @@ public class WinCheckerServiceImpl implements WinCheckerService {
 
     private List<Integer> collectListFromIndexes(List<Integer> indexes, List<Integer> list) {
         List<Integer> results = new ArrayList<>();
-        for (Integer index : indexes) {
-            results.add(list.get(index));
-        }
+        indexes.forEach(index -> results.add(list.get(index)));
         return results;
     }
 
@@ -165,12 +165,10 @@ public class WinCheckerServiceImpl implements WinCheckerService {
     }
 
     private List<Integer> createSymbolsToOneArray(List<List<Integer>> symbols) {
-        List<Integer> elements = new ArrayList<>();
-        for (List<Integer> symbol : symbols) {
-            for (Integer integer : symbol) {
-                elements.add(integer);
-            }
-        }
+        List<Integer> elements = symbols
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
         return elements;
     }
 }
