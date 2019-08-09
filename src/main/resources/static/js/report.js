@@ -12,7 +12,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
 
     $scope.winLines = [];
     $scope.reels = [];
-    $scope.showSpinner = true;
+    $scope.status = true;
 
     getWinLines();
     getReels();
@@ -32,7 +32,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
 
     $scope.submit = function () {
         if (reelsSelected.length > 2) {
-            $scope.showSpinner = false;
+            $scope.status = false;
             $http({
                 method: "POST",
                 url: 'report',
@@ -41,7 +41,7 @@ game.controller("ReportConfigController", function ($scope, $http, $timeout) {
                     'Content-Type': 'application/json'
                 }
             }).then(function successCallback(response) {
-                $scope.showSpinner = true;
+                $scope.status = true;
                 $scope.message = response.data;
                 $scope.myJson.series[0].values = response.data.balanceChart;
                 $scope.myJson.scaleX.values = response.data.rnoScaleList;

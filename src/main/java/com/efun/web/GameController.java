@@ -47,9 +47,7 @@ public class GameController {
     }
 
     @GetMapping("/simulation")
-    public String showSimulation(RedirectAttributes redirectAttributes, Model model) {
-        model.addAttribute("status", "inactive");
-
+    public String showSimulation() {
         return "report-form";
     }
 

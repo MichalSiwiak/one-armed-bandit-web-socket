@@ -27,7 +27,9 @@ public enum Status {
     LIMIT_REACHED("Maximum number of games has been exceeded"),
     CONFIGURATION_NOT_ACCEPTED("No wins calculated for this configuration"),
     UNAUTHORIZED("Unknown authorization of game"),
-    INCORRECT_DATA("Incorrect data has been sent");
+    INCORRECT_DATA("Incorrect data has been sent"),
+    SERVER_BUSY("Cannot start game now because game config is now updated. Please wait few seconds.");
+
 
     private String messageBody;
 

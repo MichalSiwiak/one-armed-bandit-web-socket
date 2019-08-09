@@ -9,4 +9,5 @@ public interface ValidationService {
     public boolean validateInitParams(InitParams initParams, String gameId);
     public boolean validateSpinParams(SpinParams spinParams);
     public boolean validateEndParams(EndParams endParams);
+
 }

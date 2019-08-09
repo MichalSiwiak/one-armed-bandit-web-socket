@@ -40,10 +40,10 @@ public class SimulationServiceTest {
         int size = 500;
 
         SimulationReportInit simulationReportInit = new SimulationReportInit();
-        simulationReportInit.setActiveReels(Arrays.asList(0, 1, 2));
-        simulationReportInit.setActiveWinLines(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
-        simulationReportInit.setSize(1000);
-        simulationReportInit.setStart(50);
+        simulationReportInit.setActiveReels(activeReels);
+        simulationReportInit.setActiveWinLines(activeWinLines);
+        simulationReportInit.setSize(size);
+        simulationReportInit.setStart(start);
         simulationReportInit.setStartingBalance(new BigDecimal("50000"));
         simulationReportInit.setBet(new BigDecimal("100"));
 
@@ -86,8 +86,8 @@ public class SimulationServiceTest {
         SimulationReportInit simulationReportInit = new SimulationReportInit();
         simulationReportInit.setActiveReels(Arrays.asList(0, 1, 2));
         simulationReportInit.setActiveWinLines(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
-        simulationReportInit.setSize(1000);
-        simulationReportInit.setStart(50);
+        simulationReportInit.setSize(size);
+        simulationReportInit.setStart(start);
         simulationReportInit.setStartingBalance(new BigDecimal("50000"));
         simulationReportInit.setBet(new BigDecimal("100"));
 

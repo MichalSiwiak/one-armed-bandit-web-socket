@@ -113,7 +113,7 @@
         <div class="mt-4 mb-4">
             <div class="container">
                 <div style=" height: 15px;">
-                    <div th:if="${status == active}">
+                    <div ng-hide="status">
                         <div class="bar"></div>
                     </div>
                 </div>
@@ -230,7 +230,7 @@
                         <h5 class="text-center mb-4">Size</h5>
                         <div class="form-group m-0 mb-0"><input ng-model="form.size" type="number" id="size"
                                                                 class="form-control text-center w-100 border-0 border-light text-dark rounded-0 bg-light"
-                                                                value="1000" min="1000" max="1000000" step="1000"
+                                                                value="1000" min="1" max="1000000" step="1"
                                                                 style="	height: 125px;	font-size: 15pt; box-shadow: 0px 0px 10px  grey, 0px 0px   black;">
                         </div>
                     </div>

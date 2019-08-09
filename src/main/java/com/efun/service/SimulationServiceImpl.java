@@ -150,7 +150,7 @@ public class SimulationServiceImpl implements SimulationService {
             numberOfWins = numberOfWins + resultWinList.size();
             balance = balance.subtract(simulationReportInit.getBet());
 
-            balanceChart.add(balance.add(sumOfWins));
+            balanceChart.add(balance.add(sumOfWins.multiply(simulationReportInit.getBet())));
             rnoScaleList.add(rno);
             rno++;
         }
@@ -164,7 +164,7 @@ public class SimulationServiceImpl implements SimulationService {
         simulationReportEnd.setBalanceChart(balanceChart);
         simulationReportEnd.setRnoScaleList(rnoScaleList);
 
-        //simulationReportEnd.setCombinationResults(total);
+        simulationReportEnd.setCombinationResults(total);
 
         return simulationReportEnd;
     }

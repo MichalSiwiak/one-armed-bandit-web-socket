@@ -5,6 +5,7 @@ import com.efun.components.SimulationReportInit;
 import com.efun.config.BeansConfiguration;
 import com.efun.config.GameConfig;
 import com.efun.service.CombinationService;
+import com.efun.service.MessageProviderService;
 import com.efun.service.SimulationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class SimulationController {
     private ApplicationContext applicationContext;
     private BeansConfiguration beansConfiguration;
     private CombinationService combinationService;
+    private MessageProviderService messageProviderService;
 
     @Value("${path_to_config_file}")
     private String pathToConfigFile;
@@ -50,39 +52,42 @@ public class SimulationController {
     public SimulationController(SimulationService simulationService,
                                 ApplicationContext applicationContext,
                                 BeansConfiguration beansConfiguration,
-                                CombinationService combinationService) {
+                                CombinationService combinationService,
+                                MessageProviderService messageProviderService) {
         this.simulationService = simulationService;
         this.applicationContext = applicationContext;
         this.beansConfiguration = beansConfiguration;
         this.combinationService = combinationService;
+        this.messageProviderService = messageProviderService;
+
     }
 
     @RequestMapping(value = "/report", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    public ResponseEntity<SimulationReportEnd> simulationServicePost(@RequestBody SimulationReportInit simulationReportInit, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("status", "active");
+    public ResponseEntity<SimulationReportEnd> simulationServicePost(@RequestBody SimulationReportInit simulationReportInit) {
         SimulationReportEnd simulationReportEnd = simulationService.generateLotOFSpins(simulationReportInit);
         LOGGER.info("Report generated size=" + simulationReportEnd.getRnoScaleList().size());
-        redirectAttributes.addFlashAttribute("status", "inactive");
         return new ResponseEntity<>(simulationReportEnd, HttpStatus.OK);
     }
 
     @PostMapping("/send")
-    public String handleFileUpload(@RequestParam("file") MultipartFile multipartFile,
-                                   RedirectAttributes redirectAttributes) {
+    public String handleFileUpload(@RequestParam("file") MultipartFile multipartFile, RedirectAttributes redirectAttributes) {
         if (multipartFile.getOriginalFilename().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Please select a valid file!");
+            redirectAttributes.addFlashAttribute("error", "Please select a valid file.");
             LOGGER.warn("Empty config file was uploaded");
         } else if (multipartFile.getSize() > 5242880) {
-            redirectAttributes.addFlashAttribute("error", "File can not be larger than 5 MB!");
+            redirectAttributes.addFlashAttribute("error", "File can not be larger than 5 MB.");
             LOGGER.warn("To large config file was uploaded");
         } else if (!multipartFile.getContentType().equals("application/json")) {
-            redirectAttributes.addFlashAttribute("error", "Please select a valid format!");
+            redirectAttributes.addFlashAttribute("error", "Please select a valid format.");
             LOGGER.warn("Invalid format of config file");
+        } else if (messageProviderService.getSessions().size() != 0) {
+            redirectAttributes.addFlashAttribute("error", "Cannot change config now - please close active sessions at first.");
+            LOGGER.warn("Cannot change config because of active sessions");
         } else {
+            messageProviderService.setTrigger(false);
             File tempFile = new File(pathToConfigFile);
             try {
                 //add verification of Game config
-                redirectAttributes.addFlashAttribute("status", "active");
                 multipartFile.transferTo(tempFile);
                 GameConfig gameConfigNew = beansConfiguration.parseGameConfigTest(tempFile);
                 applicationContext.getBean(GameConfig.class).setFilterOnlyHighestResultsInWinLine(gameConfigNew.isFilterOnlyHighestResultsInWinLine());
@@ -91,12 +96,10 @@ public class SimulationController {
                 applicationContext.getBean(GameConfig.class).setSpin(gameConfigNew.getSpin());
                 applicationContext.getBean(GameConfig.class).setWinnings(gameConfigNew.getWinnings());
                 applicationContext.getBean(GameConfig.class).setWinLines(gameConfigNew.getWinLines());
-
                 combinationService.saveAllCombinationsToDatabase();
-
                 //tempFile.delete();
                 redirectAttributes.addFlashAttribute("success", "Game configuration updated.");
-                redirectAttributes.addFlashAttribute("status", "inactive");
+                messageProviderService.setTrigger(true);
             } catch (IOException e) {
                 redirectAttributes.addFlashAttribute("error",
                         "Problem with parsing json");

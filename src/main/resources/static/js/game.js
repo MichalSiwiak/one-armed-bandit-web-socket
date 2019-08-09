@@ -148,6 +148,12 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
             $("#reels5").hide();
             setConnectedFalse();
         }
+        if (message.status == 'SERVER_BUSY') {
+            $("#reels3").hide();
+            $("#reels4").hide();
+            $("#reels5").hide();
+            setConnectedFalse();
+        }
     }
 
     function updateIconsForThreeReels(symbols) {

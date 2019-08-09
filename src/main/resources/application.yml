@@ -3,12 +3,12 @@ max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 20
 #path to config temp file
-path_to_config_file: D:\\conf.json
+path_to_config_file: /home/michal/conf.json
 #path to config temp file
-path_to_logs_file: D:\log.log
+path_to_logs_file: /home/michal/slot-simulator.log
 
 server:
-  port: 8090
+  port: 8080
 
 spring:
   data:

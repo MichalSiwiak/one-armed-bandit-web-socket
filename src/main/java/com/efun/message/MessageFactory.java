@@ -16,6 +16,7 @@ public class MessageFactory {
         } else if (status.equals(Status.LIMIT_REACHED)
                 || status.equals(Status.UNAUTHORIZED)
                 || status.equals(Status.CONFIGURATION_NOT_ACCEPTED)
+                || status.equals(Status.SERVER_BUSY)
                 || status.equals(Status.INCORRECT_DATA)) {
             return new MessageGameError(status);
         } else return null;
