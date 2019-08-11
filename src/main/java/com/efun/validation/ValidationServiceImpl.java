@@ -1,22 +1,27 @@
 package com.efun.validation;
 
 import com.efun.config.GameConfig;
+import com.efun.config.WinLine;
 import com.efun.message.EndParams;
 import com.efun.message.InitParams;
 import com.efun.message.SpinParams;
 import com.efun.web.GameController;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationService.class);
     private GameConfig gameConfig;
 
     public ValidationServiceImpl(GameConfig gameConfig) {
@@ -94,6 +99,38 @@ public class ValidationServiceImpl implements ValidationService {
             LOGGER.warn("Incorrect end data");
             return false;
         }
+    }
+
+    @Override
+    public boolean validateGameConfig(GameConfig gameConfig) {
+        if (gameConfig == null) {
+            LOGGER.warn("GameConfig should not be null ");
+            return false;
+        }
+        if (gameConfig.getReels().size() > gameConfig.getSpin().size()) {
+            LOGGER.warn("Reels size should not be larger than spin size");
+            return false;
+        }
+        if (gameConfig.getReels().size() != 5) {
+            LOGGER.warn("Reels size must be equal to 5");
+            return false;
+        }
+        Set<Integer> uniqueIds = new HashSet<>();
+        gameConfig.getReels().forEach(uniqueIds::addAll);
+        if (uniqueIds.size() > gameConfig.getWinnings().size()) {
+            LOGGER.warn("Not all unique ids on reels have representation of winnings value");
+            return false;
+        }
+
+        return true;
+        // to add winLine validation
+        /*List<WinLine> winLines = gameConfig.getWinLines();
+        for (WinLine winLine : winLines) {
+            List<List<Integer>> positions = winLine.getPositions();
+            for (List<Integer> position : positions) {
+                assertEquals(position.size(), winLine.getReels());
+            }
+        }*/
     }
 
 }

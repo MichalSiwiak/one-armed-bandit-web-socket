@@ -7,6 +7,7 @@ import com.efun.config.GameConfig;
 import com.efun.service.CombinationService;
 import com.efun.service.MessageProviderService;
 import com.efun.service.SimulationService;
+import com.efun.validation.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +42,7 @@ public class SimulationController {
     private BeansConfiguration beansConfiguration;
     private CombinationService combinationService;
     private MessageProviderService messageProviderService;
+    private ValidationService validationService;
 
     @Value("${path_to_config_file}")
     private String pathToConfigFile;
@@ -53,12 +55,14 @@ public class SimulationController {
                                 ApplicationContext applicationContext,
                                 BeansConfiguration beansConfiguration,
                                 CombinationService combinationService,
-                                MessageProviderService messageProviderService) {
+                                MessageProviderService messageProviderService,
+                                ValidationService validationService) {
         this.simulationService = simulationService;
         this.applicationContext = applicationContext;
         this.beansConfiguration = beansConfiguration;
         this.combinationService = combinationService;
         this.messageProviderService = messageProviderService;
+        this.validationService = validationService;
 
     }
 
@@ -71,25 +75,35 @@ public class SimulationController {
 
     @PostMapping("/send")
     public String handleFileUpload(@RequestParam("file") MultipartFile multipartFile, RedirectAttributes redirectAttributes) {
+        // in one method using private method and switch
         if (multipartFile.getOriginalFilename().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Please select a valid file.");
+            redirectAttributes.addFlashAttribute("error", "Please select a valid file");
             LOGGER.warn("Empty config file was uploaded");
-        } else if (multipartFile.getSize() > 5242880) {
-            redirectAttributes.addFlashAttribute("error", "File can not be larger than 5 MB.");
+            return "redirect:/simulation";
+        }
+        if (multipartFile.getSize() > 5242880) {
+            redirectAttributes.addFlashAttribute("error", "File can not be larger than 5 MB");
             LOGGER.warn("To large config file was uploaded");
-        } else if (!multipartFile.getContentType().equals("application/json")) {
-            redirectAttributes.addFlashAttribute("error", "Please select a valid format.");
+            return "redirect:/simulation";
+        }
+        if (!multipartFile.getContentType().equals("application/json")) {
+            redirectAttributes.addFlashAttribute("error", "Please select a valid format");
             LOGGER.warn("Invalid format of config file");
-        } else if (messageProviderService.getSessions().size() != 0) {
-            redirectAttributes.addFlashAttribute("error", "Cannot change config now - please close active sessions at first.");
+            return "redirect:/simulation";
+        }
+        if (messageProviderService.getSessions().size() != 0) {
+            redirectAttributes.addFlashAttribute("error", "Cannot change config now - please close active sessions at first");
             LOGGER.warn("Cannot change config because of active sessions");
-        } else {
-            messageProviderService.setTrigger(false);
-            File tempFile = new File(pathToConfigFile);
-            try {
-                //add verification of Game config
-                multipartFile.transferTo(tempFile);
-                GameConfig gameConfigNew = beansConfiguration.parseGameConfigTest(tempFile);
+            return "redirect:/simulation";
+        }
+        messageProviderService.setTrigger(false);
+        File tempFile = new File(pathToConfigFile);
+        try {
+
+            multipartFile.transferTo(tempFile);
+            GameConfig gameConfigNew = beansConfiguration.parseGameConfigTest(tempFile);
+
+            if (validationService.validateGameConfig(gameConfigNew)) {
                 applicationContext.getBean(GameConfig.class).setFilterOnlyHighestResultsInWinLine(gameConfigNew.isFilterOnlyHighestResultsInWinLine());
                 applicationContext.getBean(GameConfig.class).setWineLineOnlyOnAllActiveReels(gameConfigNew.isWineLineOnlyOnAllActiveReels());
                 applicationContext.getBean(GameConfig.class).setReels(gameConfigNew.getReels());
@@ -98,13 +112,16 @@ public class SimulationController {
                 applicationContext.getBean(GameConfig.class).setWinLines(gameConfigNew.getWinLines());
                 combinationService.saveAllCombinationsToDatabase();
                 //tempFile.delete();
-                redirectAttributes.addFlashAttribute("success", "Game configuration updated.");
+                redirectAttributes.addFlashAttribute("success", "Game configuration updated");
                 messageProviderService.setTrigger(true);
-            } catch (IOException e) {
-                redirectAttributes.addFlashAttribute("error",
-                        "Problem with parsing json");
-                LOGGER.warn("Problem with parsing json" + e.getMessage());
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Invalid game config file");
+                LOGGER.warn("Invalid game config file");
+                messageProviderService.setTrigger(true);
             }
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Problem with parsing json");
+            LOGGER.warn("Problem with parsing json" + e.getMessage());
         }
         return "redirect:/simulation";
     }
