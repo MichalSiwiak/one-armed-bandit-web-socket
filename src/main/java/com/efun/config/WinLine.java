@@ -2,6 +2,7 @@ package com.efun.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class WinLine {
     private int index;
@@ -49,5 +50,21 @@ public class WinLine {
 
     public void setMultiply(int multiply) {
         this.multiply = multiply;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof WinLine)) return false;
+        WinLine winLine = (WinLine) o;
+        return getIndex() == winLine.getIndex() &&
+                getReels() == winLine.getReels() &&
+                getMultiply() == winLine.getMultiply() &&
+                Objects.equals(getPositions(), winLine.getPositions());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIndex(), getReels(), getPositions(), getMultiply());
     }
 }

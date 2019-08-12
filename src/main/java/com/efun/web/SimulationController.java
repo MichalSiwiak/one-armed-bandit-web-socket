@@ -8,6 +8,7 @@ import com.efun.service.CombinationService;
 import com.efun.service.MessageProviderService;
 import com.efun.service.SimulationService;
 import com.efun.validation.ValidationService;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,15 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.apache.commons.io.IOUtils;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -75,6 +72,9 @@ public class SimulationController {
 
     @PostMapping("/send")
     public String handleFileUpload(@RequestParam("file") MultipartFile multipartFile, RedirectAttributes redirectAttributes) {
+        String[] split = multipartFile.getOriginalFilename().split("\\.");
+        String fileExtension = split[split.length - 1];
+
         // in one method using private method and switch
         if (multipartFile.getOriginalFilename().isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Please select a valid file");
@@ -86,8 +86,8 @@ public class SimulationController {
             LOGGER.warn("To large config file was uploaded");
             return "redirect:/simulation";
         }
-        if (!multipartFile.getContentType().equals("application/json")) {
-            redirectAttributes.addFlashAttribute("error", "Please select a valid format");
+        if (!(fileExtension.equals("yml") || fileExtension.equals("yaml"))) {
+            redirectAttributes.addFlashAttribute("error", "Please select a valid YAML format");
             LOGGER.warn("Invalid format of config file");
             return "redirect:/simulation";
         }
@@ -101,7 +101,7 @@ public class SimulationController {
         try {
 
             multipartFile.transferTo(tempFile);
-            GameConfig gameConfigNew = beansConfiguration.parseGameConfigTest(tempFile);
+            GameConfig gameConfigNew = beansConfiguration.parseGameConfig(tempFile);
 
             if (validationService.validateGameConfig(gameConfigNew)) {
                 applicationContext.getBean(GameConfig.class).setFilterOnlyHighestResultsInWinLine(gameConfigNew.isFilterOnlyHighestResultsInWinLine());
@@ -113,6 +113,7 @@ public class SimulationController {
                 combinationService.saveAllCombinationsToDatabase();
                 //tempFile.delete();
                 redirectAttributes.addFlashAttribute("success", "Game configuration updated");
+                LOGGER.info("Game configuration updated");
                 messageProviderService.setTrigger(true);
             } else {
                 redirectAttributes.addFlashAttribute("error", "Invalid game config file");
@@ -120,8 +121,8 @@ public class SimulationController {
                 messageProviderService.setTrigger(true);
             }
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Problem with parsing json");
-            LOGGER.warn("Problem with parsing json" + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Problem with access config file");
+            LOGGER.warn("Problem with access config file" + e.getMessage());
         }
         return "redirect:/simulation";
     }
@@ -141,7 +142,7 @@ public class SimulationController {
             downloadFile = new File(pathToConfigFile);
 
             if (downloadFile.length() == 0) {
-                downloadFile = ResourceUtils.getFile("classpath:config.json");
+                downloadFile = ResourceUtils.getFile("classpath:game-configuration.yml");
             }
             resource = new InputStreamResource(new FileInputStream(downloadFile));
         } catch (IOException e) {

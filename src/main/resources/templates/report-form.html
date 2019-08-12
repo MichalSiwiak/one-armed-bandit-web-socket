@@ -42,82 +42,40 @@
     Javascript and reload this page!</h2></noscript>
 <div id="wrap">
     <div id="main" class="clear-top">
-        <div class="collapse" id="navbarHeader">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-7 py-4">
-                        <h4>About</h4>
-                        <p class="text-info">Free open source projects present different java solutions using spring,
-                            hibernate and other popular frameworks.</p>
-                    </div>
-                    <div class="col-md-3 offset-md-1 py-4">
-                        <h4>Contact</h4>
-                        <ul class="list-unstyled">
-                            <li>
-                                <a href="https://pl.linkedin.com/in/michalsiwiak" class="text-secondary"
-                                   target="_blank">Follow on LinkedIn</a>
-                            </li>
-                            <li>
-                                <a href="mailto:info@coffeecoding.net" target="_top" class="text-secondary">Email me</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="navbar sticky-top navbar-dark bg-info">
+        <div class="navbar sticky-top navbar-dark bg-dark">
             <div class="container d-flex justify-content-between">
-                <a href="https://www.coffeecoding.net/" class="navbar-brand d-flex align-items-center"><i
-                        class="fa fa-home fa-2x lead fa-fw d-inline-block" aria-hidden="true"></i>&nbsp;&nbsp;<text
-                        class=""> HOME
-                </text>
+                <a href="https://github.com/MichalSiwiak/one-armed-bandit-web-socket.git" target="_blank" class="navbar-brand d-flex align-items-center"><i class="fa fa-git-square fa-fw d-inline-block lead fa-2x"></i>&nbsp;&nbsp;<text class="">SOURCE CODE </text>
                 </a>
-                <a href="https://github.com/MichalSiwiak/one-armed-bandit-web-socket.git" target="_blank"
-                   class="navbar-brand d-flex align-items-center"><i
-                        class="fa fa-git-square fa-fw d-inline-block lead fa-2x"></i>&nbsp;&nbsp;<text class="">SOURCE
-                    CODE
-                </text>
-                </a>
-                <a href="/description" class="navbar-brand d-flex align-items-center"><i
-                        class="fa fa-file-text fa-2x fa-fw lead d-inline-block" aria-hidden="true"></i>&nbsp;&nbsp;<text
-                        class="">DESCRIPTION
-                </text>
-                </a>
-                <a href="https://coffeecoding.net/resources/img/cv_msiwiak.pdf" target="_blank"
-                   class="navbar-brand d-flex align-items-center"><i
-                        class="fa fa-address-card fa-2x lead fa-fw d-inline-block" aria-hidden="true"></i>&nbsp;&nbsp;<text
-                        class="">RESUME
-                </text>
-                </a>
-                <a href="//coffeecoding.net/contact" class="navbar-brand d-flex align-items-center"><i
-                        class="fa fa-envelope fa-2x lead fa-fw d-inline-block" aria-hidden="true"></i>&nbsp;&nbsp;<text
-                        class="">CONTACT
-                </text>
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader"><span
-                        class="navbar-toggler-icon"></span></button>
             </div>
         </div>
-        <div class="text-center py-4 bg-secondary"
-             style="	background-image: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9));	background-position: top left;	background-size: 100%;	background-repeat: repeat;">
+        <div class="text-center py-4 bg-secondary text-light" style="">
             <div class="container">
                 <div class="row">
                     <div class="col-md-0 text-left">
-                        <h1 class="text-left text-primary">One Armed Bandit Web Socket Simulation</h1>
-                        <p class="lead text-left">The game is a one-armed bandit simulation - a web service that uses
-                            Spring Web Socket technology</p>
+                        <h1 class="text-left text-light">Slot Machine Simulator</h1>
                     </div>
                 </div>
             </div>
         </div>
         <div class="mt-4 mb-4">
             <div class="container">
+
+                <div class="row">
+                    <div class="col-md-3">
+                    </div>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3 m-0"></div>
+                    <div class="col-md-3">
+                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm" type="button" href="/logs">Server logs</a>
+                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm mb-3" type="button" href="/results">Sessions</a>
+                    </div>
+                </div>
                 <div style=" height: 15px;">
                     <div ng-hide="status">
                         <div class="bar"></div>
                     </div>
                 </div>
-                <p class="lead text-left">Game simulation of big number of spins</p>
+                <h3 class="m-0">Game simulation of big number of spins</h3>
             </div>
         </div>
         <div class="mt-4 mb-4">
@@ -131,19 +89,20 @@
                                     <div class="form-group"><input name="file" type="file" required="true"
                                                                    class="form-control w-100 rounded-0"></div>
                                     <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <button class="btn w-100 btn-secondary" type="submit" style="">Change
-                                                conf.
+                                        <div class="col-md-6">
+                                            <button class="btn btn-dark w-100 btn-block text-uppercase btn-sm"
+                                                    type="submit" style="">Change
+                                                configuration
                                             </button>
                                         </div>
-                                        <div class="col-md-4"><a class="btn w-100 btn-secondary" href="/downloadConfig">Current
-                                            conf</a></div>
-                                        <div class="col-md-4"><a class="btn w-100 btn-secondary" target="_blank"
-                                                                 href="/logs">Server logs</a></div>
+                                        <div class="col-md-6"><a
+                                                class="btn btn-dark w-100 btn-block text-uppercase btn-sm"
+                                                href="/downloadConfig">Current
+                                            configuration</a></div>
                                     </div>
                                 </form>
                                 <div th:if="${success}">
-                                    <div class="alert alert-success text-white px-5 mb-0" role="alert">
+                                    <div class="alert alert-info text-white px-5 mb-0" role="alert">
                                         <div class="container">
                                             <i class="now-ui-icons ui-2_like lg pull-left mr-3"></i>
                                             <strong>SUCCESS!</strong>
@@ -253,7 +212,7 @@
                     </div>
                 </div>
                 <button id="generate" type="submit"
-                        class="mt-4 btn btn-secondary w-100 btn-lg btn-block text-uppercase">
+                        class="btn mt-4 btn-dark w-100 btn-block text-uppercase btn-sm">
                     Generate Report
                 </button>
             </form>
@@ -261,7 +220,7 @@
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-12">
-                    <p class="lead text-center mt-0 mb-4">Changes of account balance through a lot of games</p>
+                    <h4 class="mt-0 mb-4 text-center">Changes of account balance through a lot of games</h4>
                 </div>
             </div>
             <div class="row">

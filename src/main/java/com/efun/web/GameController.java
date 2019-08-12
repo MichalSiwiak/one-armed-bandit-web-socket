@@ -51,7 +51,7 @@ public class GameController {
         return "report-form";
     }
 
-    @GetMapping("/demo-game")
+    @GetMapping("/demo")
     public String showTest() {
         return "game-form";
     }
