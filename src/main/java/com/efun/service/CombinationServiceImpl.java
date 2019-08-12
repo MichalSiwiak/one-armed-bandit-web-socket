@@ -1,6 +1,5 @@
 package com.efun.service;
 
-import com.efun.components.TotalWinInSpin;
 import com.efun.config.GameConfig;
 import com.efun.entity.CombinationResult;
 import com.efun.entity.CombinationResultRepository;
@@ -15,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;

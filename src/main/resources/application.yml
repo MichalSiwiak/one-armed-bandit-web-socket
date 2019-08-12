@@ -3,12 +3,10 @@ max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 20
 #path to config temp file
-path_to_config_file: D:\game-configuration.yml
+path_to_config_file: /opt/tomcat/webapps/game-configuration.yml
 #path to config temp file
-path_to_logs_file: /home/michal/slot-simulator.log
+path_to_logs_file: /opt/tomcat/logs/slot-simulator.log
 
-server:
-  port: 8080
 
 spring:
   data:
@@ -16,3 +14,10 @@ spring:
       host: localhost
       port: 27017
       database: test
+      username: admin
+      password: cokolwiek123
+
+server:
+  servlet:
+    context-path: /slot-simulator
+  port: 8090

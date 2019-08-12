@@ -66,8 +66,8 @@
                     <div class="col-md-3"></div>
                     <div class="col-md-3 m-0"></div>
                     <div class="col-md-3">
-                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm" type="button" href="/logs">Server logs</a>
-                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm mb-3" type="button" href="/results">Sessions</a>
+                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm" type="button" href="/slot-simulator/logs">Server logs</a>
+                        <a class="btn btn-dark w-100 btn-block text-uppercase btn-sm mb-3" type="button" href="/slot-simulator/results">Sessions</a>
                     </div>
                 </div>
                 <div style=" height: 15px;">
@@ -85,7 +85,7 @@
                         <div class="card w-100" style=" height: 280px;">
                             <div class="card-header text-center"> Change configuration</div>
                             <div class="card-body w-100 h-25">
-                                <form method="POST" enctype="multipart/form-data" action="/send">
+                                <form method="POST" enctype="multipart/form-data" action="/slot-simulator/send">
                                     <div class="form-group"><input name="file" type="file" required="true"
                                                                    class="form-control w-100 rounded-0"></div>
                                     <div class="row mb-2">
@@ -97,7 +97,7 @@
                                         </div>
                                         <div class="col-md-6"><a
                                                 class="btn btn-dark w-100 btn-block text-uppercase btn-sm"
-                                                href="/downloadConfig">Current
+                                                href="/slot-simulator/downloadConfig">Current
                                             configuration</a></div>
                                     </div>
                                 </form>

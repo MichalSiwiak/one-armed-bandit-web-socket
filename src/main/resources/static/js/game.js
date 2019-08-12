@@ -15,7 +15,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
 
     function connect() {
         getSessionId();
-        var socket = new SockJS('/one-armed-bandit-websocket');
+        var socket = new SockJS('https://localhost:8090/slot-simulator/one-armed-bandit-websocket');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
 
@@ -157,99 +157,99 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
     }
 
     function updateIconsForThreeReels(symbols) {
-        $("#3icon1").attr("src", '/img/' + symbols[0][0] + '.png');
-        $("#3icon2").attr("src", '/img/' + symbols[1][0] + '.png');
-        $("#3icon3").attr("src", '/img/' + symbols[2][0] + '.png');
+        $("#3icon1").attr("src", '/slot-simulator/img/' + symbols[0][0] + '.png');
+        $("#3icon2").attr("src", '/slot-simulator/img/' + symbols[1][0] + '.png');
+        $("#3icon3").attr("src", '/slot-simulator/img/' + symbols[2][0] + '.png');
 
-        $("#3icon4").attr("src", '/img/' + symbols[0][1] + '.png');
-        $("#3icon5").attr("src", '/img/' + symbols[1][1] + '.png');
-        $("#3icon6").attr("src", '/img/' + symbols[2][1] + '.png');
+        $("#3icon4").attr("src", '/slot-simulator/img/' + symbols[0][1] + '.png');
+        $("#3icon5").attr("src", '/slot-simulator/img/' + symbols[1][1] + '.png');
+        $("#3icon6").attr("src", '/slot-simulator/img/' + symbols[2][1] + '.png');
 
-        $("#3icon7").attr("src", '/img/' + symbols[0][2] + '.png');
-        $("#3icon8").attr("src", '/img/' + symbols[1][2] + '.png');
-        $("#3icon9").attr("src", '/img/' + symbols[2][2] + '.png');
+        $("#3icon7").attr("src", '/slot-simulator/img/' + symbols[0][2] + '.png');
+        $("#3icon8").attr("src", '/slot-simulator/img/' + symbols[1][2] + '.png');
+        $("#3icon9").attr("src", '/slot-simulator/img/' + symbols[2][2] + '.png');
     }
 
     function updateIconsForFourReels(symbols) {
-        $("#4icon1").attr("src", '/img/' + symbols[0][0] + '.png');
-        $("#4icon2").attr("src", '/img/' + symbols[1][0] + '.png');
-        $("#4icon3").attr("src", '/img/' + symbols[2][0] + '.png');
-        $("#4icon4").attr("src", '/img/' + symbols[3][0] + '.png');
+        $("#4icon1").attr("src", '/slot-simulator/img/' + symbols[0][0] + '.png');
+        $("#4icon2").attr("src", '/slot-simulator/img/' + symbols[1][0] + '.png');
+        $("#4icon3").attr("src", '/slot-simulator/img/' + symbols[2][0] + '.png');
+        $("#4icon4").attr("src", '/slot-simulator/img/' + symbols[3][0] + '.png');
 
-        $("#4icon5").attr("src", '/img/' + symbols[0][1] + '.png');
-        $("#4icon6").attr("src", '/img/' + symbols[1][1] + '.png');
-        $("#4icon7").attr("src", '/img/' + symbols[2][1] + '.png');
-        $("#4icon8").attr("src", '/img/' + symbols[3][1] + '.png');
+        $("#4icon5").attr("src", '/slot-simulator/img/' + symbols[0][1] + '.png');
+        $("#4icon6").attr("src", '/slot-simulator/img/' + symbols[1][1] + '.png');
+        $("#4icon7").attr("src", '/slot-simulator/img/' + symbols[2][1] + '.png');
+        $("#4icon8").attr("src", '/slot-simulator/img/' + symbols[3][1] + '.png');
 
-        $("#4icon9").attr("src", '/img/' + symbols[0][2] + '.png');
-        $("#4icon10").attr("src", '/img/' + symbols[1][2] + '.png');
-        $("#4icon11").attr("src", '/img/' + symbols[2][2] + '.png');
-        $("#4icon12").attr("src", '/img/' + symbols[3][2] + '.png');
+        $("#4icon9").attr("src", '/slot-simulator/img/' + symbols[0][2] + '.png');
+        $("#4icon10").attr("src", '/slot-simulator/img/' + symbols[1][2] + '.png');
+        $("#4icon11").attr("src", '/slot-simulator/img/' + symbols[2][2] + '.png');
+        $("#4icon12").attr("src", '/slot-simulator/img/' + symbols[3][2] + '.png');
     }
 
     function updateIconsForFiveReels(symbols) {
-        $("#5icon1").attr("src", '/img/' + symbols[0][0] + '.png');
-        $("#5icon2").attr("src", '/img/' + symbols[1][0] + '.png');
-        $("#5icon3").attr("src", '/img/' + symbols[2][0] + '.png');
-        $("#5icon4").attr("src", '/img/' + symbols[3][0] + '.png');
-        $("#5icon5").attr("src", '/img/' + symbols[4][0] + '.png');
+        $("#5icon1").attr("src", '/slot-simulator/img/' + symbols[0][0] + '.png');
+        $("#5icon2").attr("src", '/slot-simulator/img/' + symbols[1][0] + '.png');
+        $("#5icon3").attr("src", '/slot-simulator/img/' + symbols[2][0] + '.png');
+        $("#5icon4").attr("src", '/slot-simulator/img/' + symbols[3][0] + '.png');
+        $("#5icon5").attr("src", '/slot-simulator/img/' + symbols[4][0] + '.png');
 
-        $("#5icon6").attr("src", '/img/' + symbols[0][1] + '.png');
-        $("#5icon7").attr("src", '/img/' + symbols[1][1] + '.png');
-        $("#5icon8").attr("src", '/img/' + symbols[2][1] + '.png');
-        $("#5icon9").attr("src", '/img/' + symbols[3][1] + '.png');
-        $("#5icon10").attr("src", '/img/' + symbols[4][1] + '.png');
+        $("#5icon6").attr("src", '/slot-simulator/img/' + symbols[0][1] + '.png');
+        $("#5icon7").attr("src", '/slot-simulator/img/' + symbols[1][1] + '.png');
+        $("#5icon8").attr("src", '/slot-simulator/img/' + symbols[2][1] + '.png');
+        $("#5icon9").attr("src", '/slot-simulator/img/' + symbols[3][1] + '.png');
+        $("#5icon10").attr("src", '/slot-simulator/img/' + symbols[4][1] + '.png');
 
-        $("#5icon11").attr("src", '/img/' + symbols[0][2] + '.png');
-        $("#5icon12").attr("src", '/img/' + symbols[1][2] + '.png');
-        $("#5icon13").attr("src", '/img/' + symbols[2][2] + '.png');
-        $("#5icon14").attr("src", '/img/' + symbols[3][2] + '.png');
-        $("#5icon15").attr("src", '/img/' + symbols[4][2] + '.png');
+        $("#5icon11").attr("src", '/slot-simulator/img/' + symbols[0][2] + '.png');
+        $("#5icon12").attr("src", '/slot-simulator/img/' + symbols[1][2] + '.png');
+        $("#5icon13").attr("src", '/slot-simulator/img/' + symbols[2][2] + '.png');
+        $("#5icon14").attr("src", '/slot-simulator/img/' + symbols[3][2] + '.png');
+        $("#5icon15").attr("src", '/slot-simulator/img/' + symbols[4][2] + '.png');
     }
 
     function set3Ikons() {
-        $("#3icon1").attr("src", '/img/0.png');
-        $("#3icon2").attr("src", '/img/0.png');
-        $("#3icon3").attr("src", '/img/0.png');
-        $("#3icon4").attr("src", '/img/2.png');
-        $("#3icon5").attr("src", '/img/2.png');
-        $("#3icon6").attr("src", '/img/2.png');
-        $("#3icon7").attr("src", '/img/7.png');
-        $("#3icon8").attr("src", '/img/7.png');
-        $("#3icon9").attr("src", '/img/7.png');
+        $("#3icon1").attr("src", '/slot-simulator/img/0.png');
+        $("#3icon2").attr("src", '/slot-simulator/img/0.png');
+        $("#3icon3").attr("src", '/slot-simulator/img/0.png');
+        $("#3icon4").attr("src", '/slot-simulator/img/2.png');
+        $("#3icon5").attr("src", '/slot-simulator/img/2.png');
+        $("#3icon6").attr("src", '/slot-simulator/img/2.png');
+        $("#3icon7").attr("src", '/slot-simulator/img/7.png');
+        $("#3icon8").attr("src", '/slot-simulator/img/7.png');
+        $("#3icon9").attr("src", '/slot-simulator/img/7.png');
     }
 
     function set4Ikons() {
-        $("#4icon1").attr("src", '/img/0.png');
-        $("#4icon2").attr("src", '/img/0.png');
-        $("#4icon3").attr("src", '/img/0.png');
-        $("#4icon4").attr("src", '/img/0.png');
-        $("#4icon5").attr("src", '/img/2.png');
-        $("#4icon6").attr("src", '/img/2.png');
-        $("#4icon7").attr("src", '/img/2.png');
-        $("#4icon8").attr("src", '/img/2.png');
-        $("#4icon9").attr("src", '/img/7.png');
-        $("#4icon10").attr("src", '/img/7.png');
-        $("#4icon11").attr("src", '/img/7.png');
-        $("#4icon12").attr("src", '/img/7.png');
+        $("#4icon1").attr("src", '/slot-simulator/img/0.png');
+        $("#4icon2").attr("src", '/slot-simulator/img/0.png');
+        $("#4icon3").attr("src", '/slot-simulator/img/0.png');
+        $("#4icon4").attr("src", '/slot-simulator/img/0.png');
+        $("#4icon5").attr("src", '/slot-simulator/img/2.png');
+        $("#4icon6").attr("src", '/slot-simulator/img/2.png');
+        $("#4icon7").attr("src", '/slot-simulator/img/2.png');
+        $("#4icon8").attr("src", '/slot-simulator/img/2.png');
+        $("#4icon9").attr("src", '/slot-simulator/img/7.png');
+        $("#4icon10").attr("src", '/slot-simulator/img/7.png');
+        $("#4icon11").attr("src", '/slot-simulator/img/7.png');
+        $("#4icon12").attr("src", '/slot-simulator/img/7.png');
     }
 
     function set5Ikons() {
-        $("#5icon1").attr("src", '/img/0.png');
-        $("#5icon2").attr("src", '/img/0.png');
-        $("#5icon3").attr("src", '/img/0.png');
-        $("#5icon4").attr("src", '/img/0.png');
-        $("#5icon5").attr("src", '/img/0.png');
-        $("#5icon6").attr("src", '/img/2.png');
-        $("#5icon7").attr("src", '/img/2.png');
-        $("#5icon8").attr("src", '/img/2.png');
-        $("#5icon9").attr("src", '/img/2.png');
-        $("#5icon10").attr("src", '/img/2.png');
-        $("#5icon11").attr("src", '/img/7.png');
-        $("#5icon12").attr("src", '/img/7.png');
-        $("#5icon13").attr("src", '/img/7.png');
-        $("#5icon14").attr("src", '/img/7.png');
-        $("#5icon15").attr("src", '/img/7.png');
+        $("#5icon1").attr("src", '/slot-simulator/img/0.png');
+        $("#5icon2").attr("src", '/slot-simulator/img/0.png');
+        $("#5icon3").attr("src", '/slot-simulator/img/0.png');
+        $("#5icon4").attr("src", '/slot-simulator/img/0.png');
+        $("#5icon5").attr("src", '/slot-simulator/img/0.png');
+        $("#5icon6").attr("src", '/slot-simulator/img/2.png');
+        $("#5icon7").attr("src", '/slot-simulator/img/2.png');
+        $("#5icon8").attr("src", '/slot-simulator/img/2.png');
+        $("#5icon9").attr("src", '/slot-simulator/img/2.png');
+        $("#5icon10").attr("src", '/slot-simulator/img/2.png');
+        $("#5icon11").attr("src", '/slot-simulator/img/7.png');
+        $("#5icon12").attr("src", '/slot-simulator/img/7.png');
+        $("#5icon13").attr("src", '/slot-simulator/img/7.png');
+        $("#5icon14").attr("src", '/slot-simulator/img/7.png');
+        $("#5icon15").attr("src", '/slot-simulator/img/7.png');
     }
 
     function setConnectedTrue() {

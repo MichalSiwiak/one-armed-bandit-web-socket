@@ -9,7 +9,7 @@ functions.controller("SessionConfigController", function ($scope, $http, $timeou
     connect();
 
     function connect() {
-        socket = new SockJS('/one-armed-bandit-websocket');
+        socket = new SockJS('/slot-simulator/one-armed-bandit-websocket');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
