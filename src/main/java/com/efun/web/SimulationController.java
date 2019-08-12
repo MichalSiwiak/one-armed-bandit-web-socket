@@ -101,7 +101,7 @@ public class SimulationController {
         try {
 
             multipartFile.transferTo(tempFile);
-            GameConfig gameConfigNew = beansConfiguration.parseGameConfig(tempFile);
+            GameConfig gameConfigNew = beansConfiguration.parseGameConfig(tempFile.getAbsolutePath());
 
             if (validationService.validateGameConfig(gameConfigNew)) {
                 applicationContext.getBean(GameConfig.class).setFilterOnlyHighestResultsInWinLine(gameConfigNew.isFilterOnlyHighestResultsInWinLine());
@@ -140,10 +140,9 @@ public class SimulationController {
         InputStreamResource resource = null;
         try {
             downloadFile = new File(pathToConfigFile);
-
-            if (downloadFile.length() == 0) {
+            /*if (downloadFile.length() == 0) {
                 downloadFile = ResourceUtils.getFile("classpath:game-configuration.yml");
-            }
+            }*/
             resource = new InputStreamResource(new FileInputStream(downloadFile));
         } catch (IOException e) {
             LOGGER.warn("Problem with downloading file" + e.getMessage());

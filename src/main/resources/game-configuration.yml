@@ -7,7 +7,7 @@ reels:
   - [1, 2, 2, 2, 0, 3, 3, 3, 3, 5, 6, 6, 6, 5, 5, 5, 5, 2, 3, 4, 1, 1, 1, 7, 7, 7, 7, 7, 5, 1, 1, 1]
   - [0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 1, 1, 2]
 spin: [6, 10, 3, 4, 21]
-winnings: [1.0, 12.0, 3.0, 0.8, 0.4, 10.0, 99.0, 10.0]
+winnings: [2.0, 12.0, 3.0, 0.8, 0.4, 10.0, 99.0, 10.0]
 wineLineOnlyOnAllActiveReels: false #check the wine line only on all active reels
 filterOnlyHighestResultsInWinLine: true #filter only the highest results in wine line
 winLines:

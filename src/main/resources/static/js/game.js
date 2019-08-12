@@ -15,7 +15,7 @@ game.controller("ApplicationConfigController", function ($scope, $http, $timeout
 
     function connect() {
         getSessionId();
-        var socket = new SockJS('https://localhost:8090/slot-simulator/one-armed-bandit-websocket');
+        var socket = new SockJS('/slot-simulator/one-armed-bandit-websocket');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
 

@@ -1,5 +1,6 @@
 package com.efun.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
@@ -10,14 +11,17 @@ import java.io.*;
 @Configuration
 public class BeansConfiguration {
 
+    @Value("${path_to_config_file}")
+    private String pathToConfigFile;
+
     @Bean
     public GameConfig gameConfig() throws IOException {
-        return parseGameConfig(ResourceUtils.getFile("classpath:game-configuration.yml"));
+        return parseGameConfig(pathToConfigFile);
     }
 
-    public GameConfig parseGameConfig(File file) throws IOException {
+    public GameConfig parseGameConfig(String fileName) throws IOException {
         Yaml yaml = new Yaml();
-        InputStream inputStream = new FileInputStream(file);
+        InputStream inputStream = new FileInputStream(new File(fileName));
         GameConfig gameConfig = yaml.loadAs(inputStream, GameConfig.class);
         inputStream.close();
         return gameConfig;
