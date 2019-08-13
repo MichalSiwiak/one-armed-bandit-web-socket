@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -46,7 +46,7 @@ public class CombinationServiceImpl implements CombinationService {
     }
 
     //run this method if game configuration is updated
-    //@PostConstruct
+    @PostConstruct
     public void saveAllCombinationsToDatabase() {
         //dropping collection to clear old data
         mongoTemplate.dropCollection(CombinationResult.class);
