@@ -4,10 +4,10 @@ max_random_number: 500
 max_game_number: 20
 #path to config temp file
 #path_to_config_file: /opt/tomcat/webapps/game-configuration.yml
-path_to_config_file: /media/michal/Documents/Workspace/one-armed-bandit-web-socket/src/main/resources/game-configuration.yml
+path_to_config_file: /home/siwiakmichal/bootapp/one-armed-bandit-web-socket/src/main/resources/game-configuration.yml
 #path to config temp file
 #path_to_logs_file: /opt/tomcat/logs/slot-simulator.log
-path_to_logs_file: /home/michal/slot-simulator.log
+path_to_logs_file: /home/siwiakmichal/bootapp/one-armed-bandit-web-socket/slot-simulator.log
 
 
 spring:
@@ -16,6 +16,8 @@ spring:
       host: localhost
       port: 27017
       database: test
+      username: admin
+      password: cokolwiek123
 
 server:
   servlet:
