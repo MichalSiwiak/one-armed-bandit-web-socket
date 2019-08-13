@@ -8,6 +8,8 @@ import com.efun.service.CombinationService;
 import com.efun.service.MessageProviderService;
 import com.efun.service.SimulationService;
 import com.efun.validation.ValidationService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 @Controller
 public class SimulationController {
@@ -43,6 +42,9 @@ public class SimulationController {
 
     @Value("${path_to_config_file}")
     private String pathToConfigFile;
+
+    @Value("${path_to_results_file}")
+    private String pathToResultsFile;
 
     @Value("${path_to_logs_file}")
     private String pathToLogsFile;
@@ -66,6 +68,15 @@ public class SimulationController {
     @RequestMapping(value = "/report", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<SimulationReportEnd> simulationServicePost(@RequestBody SimulationReportInit simulationReportInit) {
         SimulationReportEnd simulationReportEnd = simulationService.generateLotOFSpins(simulationReportInit);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        try (FileWriter writer = new FileWriter(pathToResultsFile)) {
+            gson.toJson(simulationReportEnd.getCombinationResults(), writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         LOGGER.info("Report generated size=" + simulationReportEnd.getRnoScaleList().size());
         return new ResponseEntity<>(simulationReportEnd, HttpStatus.OK);
     }
@@ -101,7 +112,7 @@ public class SimulationController {
         try {
 
             multipartFile.transferTo(tempFile);
-            GameConfig gameConfigNew = beansConfiguration.parseGameConfig(tempFile.getAbsolutePath());
+            GameConfig gameConfigNew = beansConfiguration.parseGameConfigFromFile(tempFile.getAbsolutePath());
 
             if (validationService.validateGameConfig(gameConfigNew)) {
                 applicationContext.getBean(GameConfig.class).setFilterOnlyHighestResultsInWinLine(gameConfigNew.isFilterOnlyHighestResultsInWinLine());
@@ -136,13 +147,30 @@ public class SimulationController {
 
     @GetMapping("/downloadConfig")
     public ResponseEntity<InputStreamResource> downloadFile() {
-        File downloadFile = null;
+        File downloadFile = new File(pathToConfigFile);
         InputStreamResource resource = null;
         try {
-            downloadFile = new File(pathToConfigFile);
-            /*if (downloadFile.length() == 0) {
+            //if jar packaging comment this if
+            if (downloadFile.length() == 0) {
                 downloadFile = ResourceUtils.getFile("classpath:game-configuration.yml");
-            }*/
+            }
+            resource = new InputStreamResource(new FileInputStream(downloadFile));
+        } catch (IOException e) {
+            LOGGER.warn("Problem with downloading file" + e.getMessage());
+        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment;filename=" + downloadFile.getName())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(downloadFile.length())
+                .body(resource);
+    }
+
+    @GetMapping("/downloadResults")
+    public ResponseEntity<InputStreamResource> downloadResults() {
+        File downloadFile = new File(pathToResultsFile);
+        InputStreamResource resource = null;
+        try {
             resource = new InputStreamResource(new FileInputStream(downloadFile));
         } catch (IOException e) {
             LOGGER.warn("Problem with downloading file" + e.getMessage());

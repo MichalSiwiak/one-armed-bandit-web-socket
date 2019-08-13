@@ -3,11 +3,13 @@ max_random_number: 500
 #the maximum number of games supported by server
 max_game_number: 20
 #path to config temp file
-#path_to_config_file: /opt/tomcat/webapps/game-configuration.yml
-path_to_config_file: /home/siwiakmichal/bootapp/one-armed-bandit-web-socket/src/main/resources/game-configuration.yml
+path_to_config_file: /opt/tomcat/webapps/game-configuration.yml
+#path_to_config_file: D:\game-configuration.yml
 #path to config temp file
-#path_to_logs_file: /opt/tomcat/logs/slot-simulator.log
-path_to_logs_file: /home/siwiakmichal/bootapp/one-armed-bandit-web-socket/slot-simulator.log
+path_to_logs_file: /opt/tomcat/webapps/slot-simulator.log
+#path_to_logs_file: D:\slot-simulator.log
+path_to_results_file: /opt/tomcat/webapps/results.json
+#path_to_results_file: D:\results.json
 
 
 spring:
@@ -16,10 +18,9 @@ spring:
       host: localhost
       port: 27017
       database: test
-      username: admin
-      password: cokolwiek123
+
 
 server:
   servlet:
     context-path: /slot-simulator
-  port: 8090
+  port: 8080
